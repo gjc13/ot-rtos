@@ -1,0 +1,23 @@
+*.swp
+log.log
+_build/
+build/
+
+.config
+*.o
+*.pyc
+
+build
+sdkconfig
+sdkconfig.old
+
+TEST_LOGS
+
+# gcov coverage reports
+*.gcda
+*.gcno
+coverage.info
+coverage_report/
+
+# private google cloud iot configs
+client_cfg.h
