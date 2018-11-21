@@ -49,7 +49,6 @@
 #include "apps/misc/nat64_utils.h"
 #include "lwip/netdb.h"
 
-
 static TaskHandle_t      sMainTask     = NULL;
 static SemaphoreHandle_t sExternalLock = NULL;
 static otInstance *      sInstance     = NULL;
