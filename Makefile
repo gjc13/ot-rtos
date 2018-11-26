@@ -52,49 +52,49 @@ SRC_DIR := ./src/
 $(OUTPUT_DIRECTORY)/ot_cli_freertos.out: \
     LINKER_SCRIPT  := $(SRC_DIR)/platforms/nrf52840/gcc_nrf52.ld
 
-MBEDTLS_DIR := $(PROJ_DIR)/third_party/openthread/third_party/mbedtls
+MBEDTLS_DIR := $(PROJ_DIR)/third_party/openthread/repo/third_party/mbedtls
 
-OT_DRIVER_DIR := $(PROJ_DIR)/third_party/openthread/third_party/NordicSemiconductor/
+OT_DRIVER_DIR := $(PROJ_DIR)/third_party/openthread/repo/third_party/NordicSemiconductor/
 
 OPENTHREAD_SRC_FILES_ = \
-    $(wildcard $(PROJ_DIR)/third_party/openthread/src/cli/*.cpp) \
-    $(wildcard $(PROJ_DIR)/third_party/openthread/src/cli/*.c) \
-    $(wildcard $(PROJ_DIR)/third_party/openthread/src/diag/*.c) \
-    $(wildcard $(PROJ_DIR)/third_party/openthread/src/diag/*.cpp) \
-    $(wildcard $(PROJ_DIR)/third_party/openthread/src/core/*.cpp) \
-    $(wildcard $(PROJ_DIR)/third_party/openthread/src/core/*.c) \
-    $(wildcard $(PROJ_DIR)/third_party/openthread/src/core/api/*.cpp) \
-    $(wildcard $(PROJ_DIR)/third_party/openthread/src/core/api/*.c) \
-    $(wildcard $(PROJ_DIR)/third_party/openthread/src/core/coap/*.cpp) \
-    $(wildcard $(PROJ_DIR)/third_party/openthread/src/core/coap/*.c) \
-    $(wildcard $(PROJ_DIR)/third_party/openthread/src/core/common/*.cpp) \
-    $(wildcard $(PROJ_DIR)/third_party/openthread/src/core/common/*.c) \
-    $(wildcard $(PROJ_DIR)/third_party/openthread/src/core/crypto/*.cpp) \
-    $(wildcard $(PROJ_DIR)/third_party/openthread/src/core/crypto/*.c) \
-    $(wildcard $(PROJ_DIR)/third_party/openthread/src/core/mac/*.cpp) \
-    $(wildcard $(PROJ_DIR)/third_party/openthread/src/core/mac/*.c) \
-    $(wildcard $(PROJ_DIR)/third_party/openthread/src/core/meshcop/*.cpp) \
-    $(wildcard $(PROJ_DIR)/third_party/openthread/src/core/meshcop/*.c) \
-    $(wildcard $(PROJ_DIR)/third_party/openthread/src/core/net/*.cpp) \
-    $(wildcard $(PROJ_DIR)/third_party/openthread/src/core/net/*.c) \
-    $(wildcard $(PROJ_DIR)/third_party/openthread/src/core/thread/*.cpp) \
-    $(wildcard $(PROJ_DIR)/third_party/openthread/src/core/thread/*.c) \
-    $(wildcard $(PROJ_DIR)/third_party/openthread/src/core/utils/*.cpp) \
-    $(wildcard $(PROJ_DIR)/third_party/openthread/src/core/utils/*.c) \
-    $(wildcard $(PROJ_DIR)/third_party/openthread/src/ncp/*.cpp) \
-    $(wildcard $(PROJ_DIR)/third_party/openthread/src/ncp/*.c) \
-    $(wildcard $(PROJ_DIR)/third_party/openthread/examples/platforms/utils/*.cpp) \
-    $(wildcard $(PROJ_DIR)/third_party/openthread/examples/platforms/utils/*.c) \
+    $(wildcard $(PROJ_DIR)/third_party/openthread/repo/src/cli/*.cpp) \
+    $(wildcard $(PROJ_DIR)/third_party/openthread/repo/src/cli/*.c) \
+    $(wildcard $(PROJ_DIR)/third_party/openthread/repo/src/diag/*.c) \
+    $(wildcard $(PROJ_DIR)/third_party/openthread/repo/src/diag/*.cpp) \
+    $(wildcard $(PROJ_DIR)/third_party/openthread/repo/src/core/*.cpp) \
+    $(wildcard $(PROJ_DIR)/third_party/openthread/repo/src/core/*.c) \
+    $(wildcard $(PROJ_DIR)/third_party/openthread/repo/src/core/api/*.cpp) \
+    $(wildcard $(PROJ_DIR)/third_party/openthread/repo/src/core/api/*.c) \
+    $(wildcard $(PROJ_DIR)/third_party/openthread/repo/src/core/coap/*.cpp) \
+    $(wildcard $(PROJ_DIR)/third_party/openthread/repo/src/core/coap/*.c) \
+    $(wildcard $(PROJ_DIR)/third_party/openthread/repo/src/core/common/*.cpp) \
+    $(wildcard $(PROJ_DIR)/third_party/openthread/repo/src/core/common/*.c) \
+    $(wildcard $(PROJ_DIR)/third_party/openthread/repo/src/core/crypto/*.cpp) \
+    $(wildcard $(PROJ_DIR)/third_party/openthread/repo/src/core/crypto/*.c) \
+    $(wildcard $(PROJ_DIR)/third_party/openthread/repo/src/core/mac/*.cpp) \
+    $(wildcard $(PROJ_DIR)/third_party/openthread/repo/src/core/mac/*.c) \
+    $(wildcard $(PROJ_DIR)/third_party/openthread/repo/src/core/meshcop/*.cpp) \
+    $(wildcard $(PROJ_DIR)/third_party/openthread/repo/src/core/meshcop/*.c) \
+    $(wildcard $(PROJ_DIR)/third_party/openthread/repo/src/core/net/*.cpp) \
+    $(wildcard $(PROJ_DIR)/third_party/openthread/repo/src/core/net/*.c) \
+    $(wildcard $(PROJ_DIR)/third_party/openthread/repo/src/core/thread/*.cpp) \
+    $(wildcard $(PROJ_DIR)/third_party/openthread/repo/src/core/thread/*.c) \
+    $(wildcard $(PROJ_DIR)/third_party/openthread/repo/src/core/utils/*.cpp) \
+    $(wildcard $(PROJ_DIR)/third_party/openthread/repo/src/core/utils/*.c) \
+    $(wildcard $(PROJ_DIR)/third_party/openthread/repo/src/ncp/*.cpp) \
+    $(wildcard $(PROJ_DIR)/third_party/openthread/repo/src/ncp/*.c) \
+    $(wildcard $(PROJ_DIR)/third_party/openthread/repo/examples/platforms/utils/*.cpp) \
+    $(wildcard $(PROJ_DIR)/third_party/openthread/repo/examples/platforms/utils/*.c) \
 
-OPENTHREAD_SRC_FILES = $(filter-out $(PROJ_DIR)/third_party/openthread/src/core/common/extension_example.cpp, $(OPENTHREAD_SRC_FILES_))
+OPENTHREAD_SRC_FILES = $(filter-out $(PROJ_DIR)/third_party/openthread/repo/src/core/common/extension_example.cpp, $(OPENTHREAD_SRC_FILES_))
 
 OPENTHREAD_INC_FOLDERS = \
-    $(PROJ_DIR)/third_party/openthread/examples/platforms \
-    $(PROJ_DIR)/third_party/openthread/include \
-    $(PROJ_DIR)/third_party/openthread/src/core \
-    $(PROJ_DIR)/third_party/openthread/src/ncp \
-    $(PROJ_DIR)/third_party/openthread/src/cli \
-    $(PROJ_DIR)/third_party/openthread/src/ \
+    $(PROJ_DIR)/third_party/openthread/repo/examples/platforms \
+    $(PROJ_DIR)/third_party/openthread/repo/include \
+    $(PROJ_DIR)/third_party/openthread/repo/src/core \
+    $(PROJ_DIR)/third_party/openthread/repo/src/ncp \
+    $(PROJ_DIR)/third_party/openthread/repo/src/cli \
+    $(PROJ_DIR)/third_party/openthread/repo/src/ \
 
 MBEDTLS_SRC_FILES = \
     $(MBEDTLS_DIR)/repo/library/aes.c                          \
