@@ -8,12 +8,11 @@ Get Started
 
 ```sh
 git submodule update --init
-make -j12
-# plug in NRF52840 DK
-make flash
+mkdir build && cd build
+cmake .. -CMAKE_TOOLCHAIN_FILE=../cmake/arm-none-eabi.cmake
 ```
 
-This will build the demo application of OpenThread command line in `src/examples/ot_cli`, you can use the command line application by connecting to the serial port of NRF52840.
+This will build the demo application of OpenThread command line in `build/ot_cli_nrf52840`, you can use the command line application by connecting to the serial port of NRF52840.
 
 ### Test Http Client
 

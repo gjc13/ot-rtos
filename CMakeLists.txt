@@ -60,7 +60,6 @@ target_compile_definitions(nrf-sdk-config
 add_subdirectory(third_party/nRF5_SDK)
 add_subdirectory(third_party/openthread)
 add_subdirectory(third_party/openthread/third_party/mbedtls)
-set(JANSSON_BUILD_DOCS OFF)
 add_subdirectory(third_party/jansson/)
 add_subdirectory(third_party/libjwt/)
 add_subdirectory(third_party/lwip)
