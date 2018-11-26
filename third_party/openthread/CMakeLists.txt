@@ -1,0 +1,321 @@
+cmake_minimum_required (VERSION 3.7)
+
+set(OPENTHREAD_SRCS
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/cli/cli.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/cli/cli_coap.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/cli/cli_coap_secure.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/cli/cli_console.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/cli/cli_dataset.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/cli/cli_instance.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/cli/cli_uart.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/cli/cli_udp_example.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/api/border_agent_api.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/api/border_router_api.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/api/channel_manager_api.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/api/channel_monitor_api.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/api/child_supervision_api.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/api/coap_api.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/api/coap_secure_api.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/api/commissioner_api.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/api/crypto_api.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/api/dataset_api.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/api/dataset_ftd_api.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/api/dhcp6_api.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/api/dns_api.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/api/icmp6_api.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/api/instance_api.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/api/ip6_api.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/api/jam_detection_api.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/api/joiner_api.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/api/link_api.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/api/link_raw_api.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/api/logging_api.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/api/message_api.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/api/netdata_api.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/api/network_time_api.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/api/server_api.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/api/sntp_api.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/api/tasklet_api.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/api/thread_api.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/api/thread_ftd_api.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/api/udp_api.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/coap/coap.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/coap/coap_header.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/coap/coap_secure.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/common/crc16.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/common/instance.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/common/locator.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/common/logging.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/common/message.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/common/notifier.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/common/settings.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/common/string.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/common/tasklet.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/common/timer.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/common/tlvs.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/common/trickle_timer.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/crypto/aes_ccm.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/crypto/aes_ecb.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/crypto/ecdsa.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/crypto/hmac_sha256.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/crypto/mbedtls.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/crypto/pbkdf2_cmac.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/crypto/sha256.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/mac/channel_mask.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/mac/link_raw.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/mac/mac.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/mac/mac_filter.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/mac/mac_frame.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/meshcop/announce_begin_client.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/meshcop/border_agent.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/meshcop/commissioner.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/meshcop/dataset.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/meshcop/dataset_local.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/meshcop/dataset_manager.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/meshcop/dataset_manager_ftd.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/meshcop/dtls.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/meshcop/energy_scan_client.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/meshcop/joiner.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/meshcop/joiner_router.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/meshcop/leader.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/meshcop/meshcop.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/meshcop/meshcop_tlvs.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/meshcop/panid_query_client.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/meshcop/timestamp.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/net/dhcp6_client.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/net/dhcp6_server.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/net/dns_client.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/net/icmp6.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/net/ip6.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/net/ip6_address.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/net/ip6_filter.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/net/ip6_headers.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/net/ip6_mpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/net/ip6_routes.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/net/netif.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/net/sntp_client.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/net/udp6.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/thread/address_resolver.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/thread/announce_begin_server.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/thread/announce_sender.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/thread/child_table.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/thread/data_poll_manager.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/thread/energy_scan_server.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/thread/key_manager.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/thread/link_quality.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/thread/lowpan.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/thread/mesh_forwarder.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/thread/mesh_forwarder_ftd.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/thread/mesh_forwarder_mtd.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/thread/mle.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/thread/mle_router.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/thread/network_data.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/thread/network_data_leader.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/thread/network_data_leader_ftd.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/thread/network_data_local.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/thread/network_diagnostic.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/thread/panid_query_server.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/thread/router_table.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/thread/src_match_controller.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/thread/thread_netif.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/thread/time_sync_service.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/thread/topology.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/utils/channel_manager.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/utils/channel_monitor.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/utils/child_supervision.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/utils/heap.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/utils/jam_detector.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/utils/missing_strlcat.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/utils/missing_strlcpy.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/utils/missing_strnlen.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/utils/parse_cmdline.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core/utils/slaac_address.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/diag/diag_process.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/diag/openthread-diag.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/ncp/changed_props_set.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/ncp/hdlc.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/ncp/ncp_base.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/ncp/ncp_base_dispatcher.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/ncp/ncp_base_ftd.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/ncp/ncp_base_mtd.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/ncp/ncp_base_radio.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/ncp/ncp_spi.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/ncp/ncp_uart.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/ncp/spinel.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/ncp/spinel_decoder.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/ncp/spinel_encoder.cpp
+)
+
+
+add_library(openthread ${OPENTHREAD_SRCS})
+target_include_directories(openthread
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/repo/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core
+        ${CMAKE_CURRENT_SOURCE_DIR}/repo/examples/platforms/
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/repo/src
+)
+target_link_libraries(openthread
+    PUBLIC
+        mbedtls
+        openthread-config
+    PRIVATE
+        openthread_platform_utils
+        ot_platform_nrf52840
+)
+
+add_library(openthread_platform_api INTERFACE)
+target_include_directories(openthread_platform_api
+    INTERFACE
+        ${CMAKE_CURRENT_SOURCE_DIR}/repo/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core
+)
+
+set(OPENTHREAD_PLATFORM_UTILS_SRCS
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/examples/platforms/utils/settings_flash.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/examples/platforms/utils/debug_uart.c
+)
+add_library(openthread_platform_utils ${OPENTHREAD_PLATFORM_UTILS_SRCS})
+target_include_directories(openthread_platform_utils
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/repo/examples/platforms/
+)
+target_link_libraries(openthread_platform_utils
+    PUBLIC
+        openthread
+    PRIVATE
+        ot_platform_nrf52840
+)
+
+set(NORDIC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor)
+
+set(NRF_RADIO_SRCS
+    ${NORDIC_DIR}/drivers/radio/nrf_802154_notification_direct.c
+    ${NORDIC_DIR}/drivers/radio/nrf_802154_priority_drop_direct.c
+    ${NORDIC_DIR}/drivers/radio/nrf_802154_request_direct.c
+    ${NORDIC_DIR}/drivers/radio/nrf_802154.c
+    ${NORDIC_DIR}/drivers/radio/nrf_802154_ack_pending_bit.c
+    ${NORDIC_DIR}/drivers/radio/nrf_802154_core.c
+    ${NORDIC_DIR}/drivers/radio/nrf_802154_core_hooks.c
+    ${NORDIC_DIR}/drivers/radio/nrf_802154_critical_section.c
+    ${NORDIC_DIR}/drivers/radio/nrf_802154_debug.c
+    ${NORDIC_DIR}/drivers/radio/nrf_802154_pib.c
+    ${NORDIC_DIR}/drivers/radio/nrf_802154_revision.c
+    ${NORDIC_DIR}/drivers/radio/nrf_802154_rsch.c
+    ${NORDIC_DIR}/drivers/radio/nrf_802154_rssi.c
+    ${NORDIC_DIR}/drivers/radio/nrf_802154_rx_buffer.c
+    ${NORDIC_DIR}/drivers/radio/nrf_802154_timer_coord.c
+    ${NORDIC_DIR}/drivers/radio/fem/nrf_fem_control.c
+    ${NORDIC_DIR}/drivers/radio/mac_features/nrf_802154_ack_timeout.c
+    ${NORDIC_DIR}/drivers/radio/mac_features/nrf_802154_csma_ca.c
+    ${NORDIC_DIR}/drivers/radio/mac_features/nrf_802154_delayed_trx.c
+    ${NORDIC_DIR}/drivers/radio/mac_features/nrf_802154_filter.c
+    ${NORDIC_DIR}/drivers/radio/platform/clock/nrf_802154_clock_sdk.c
+    ${NORDIC_DIR}/drivers/radio/platform/hp_timer/nrf_802154_hp_timer.c
+    ${NORDIC_DIR}/drivers/radio/timer_scheduler/nrf_802154_timer_sched.c
+    ${NORDIC_DIR}/drivers/radio/raal/single_phy/single_phy.c
+)
+
+add_library(nrf_radio ${NRF_RADIO_SRCS})
+
+target_include_directories(nrf_radio
+    PUBLIC
+        ${NORDIC_DIR}/drivers/radio
+    PRIVATE
+        ${NORDIC_DIR}/drivers/radio/hal
+        ${NORDIC_DIR}/drivers/radio/raal
+)
+
+target_link_libraries(nrf_radio
+    PUBLIC
+        nrf_driver
+)
+
+set(NRF_CRYPTO_SRCS
+    ${NORDIC_DIR}/libraries/crypto/aes_alt.c
+    ${NORDIC_DIR}/libraries/crypto/aes_alt_cc310.c
+    ${NORDIC_DIR}/libraries/crypto/aes_alt_soft.c
+    ${NORDIC_DIR}/libraries/crypto/cc310_mbedtls.c
+    ${NORDIC_DIR}/libraries/crypto/ecp_alt_cc310.c
+    ${NORDIC_DIR}/libraries/crypto/ecp_curves_alt.c
+    ${NORDIC_DIR}/libraries/crypto/sha256_alt_cc310.c
+)
+
+add_library(nrf_crypto ${NRF_CRYPTO_SRCS})
+
+target_include_directories(nrf_crypto
+    PUBLIC
+        ${NORDIC_DIR}/libraries/crypto
+)
+
+target_link_libraries(nrf_crypto
+    PUBLIC
+        mbedtls
+        nrf_cc310_interface
+        nrf_driver
+        openthread-config
+        openthread_platform_api
+    PRIVATE
+        nrf_cc310
+)
+
+set(MBEDTLS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/mbedtls/repo)
+
+set(MBEDTLS_SRCS
+    ${MBEDTLS_DIR}/library/aes.c
+    ${MBEDTLS_DIR}/library/asn1parse.c
+    ${MBEDTLS_DIR}/library/asn1write.c
+    ${MBEDTLS_DIR}/library/base64.c
+    ${MBEDTLS_DIR}/library/bignum.c
+    ${MBEDTLS_DIR}/library/ccm.c
+    ${MBEDTLS_DIR}/library/cipher.c
+    ${MBEDTLS_DIR}/library/cipher_wrap.c
+    ${MBEDTLS_DIR}/library/cmac.c
+    ${MBEDTLS_DIR}/library/ctr_drbg.c
+    ${MBEDTLS_DIR}/library/debug.c
+    ${MBEDTLS_DIR}/library/ecdh.c
+    ${MBEDTLS_DIR}/library/ecdsa.c
+    ${MBEDTLS_DIR}/library/ecjpake.c
+    ${MBEDTLS_DIR}/library/ecp_curves.c
+    ${MBEDTLS_DIR}/library/ecp.c
+    ${MBEDTLS_DIR}/library/entropy.c
+    ${MBEDTLS_DIR}/library/entropy_poll.c
+    ${MBEDTLS_DIR}/library/gcm.c
+    ${MBEDTLS_DIR}/library/md.c
+    ${MBEDTLS_DIR}/library/md_wrap.c
+    ${MBEDTLS_DIR}/library/memory_buffer_alloc.c
+    ${MBEDTLS_DIR}/library/oid.c
+    ${MBEDTLS_DIR}/library/pem.c
+    ${MBEDTLS_DIR}/library/pk.c
+    ${MBEDTLS_DIR}/library/pk_wrap.c
+    ${MBEDTLS_DIR}/library/pkparse.c
+    ${MBEDTLS_DIR}/library/platform.c
+    ${MBEDTLS_DIR}/library/platform_util.c
+    ${MBEDTLS_DIR}/library/sha1.c
+    ${MBEDTLS_DIR}/library/sha256.c
+    ${MBEDTLS_DIR}/library/ssl_cookie.c
+    ${MBEDTLS_DIR}/library/ssl_ciphersuites.c
+    ${MBEDTLS_DIR}/library/ssl_cli.c
+    ${MBEDTLS_DIR}/library/ssl_srv.c
+    ${MBEDTLS_DIR}/library/ssl_ticket.c
+    ${MBEDTLS_DIR}/library/ssl_tls.c
+    ${MBEDTLS_DIR}/library/x509.c
+    ${MBEDTLS_DIR}/library/x509_crt.c
+    ${MBEDTLS_DIR}/library/rsa.c
+    ${MBEDTLS_DIR}/library/rsa_internal.c
+)
+
+add_library(mbedtls ${MBEDTLS_SRCS})
+
+target_include_directories(mbedtls
+    PUBLIC
+        ${MBEDTLS_DIR}/include
+        ${MBEDTLS_DIR}/include/mbedtls
+)
+
+target_link_libraries(mbedtls
+    PUBLIC
+        mbedtls-config
+        nrf_crypto
+)

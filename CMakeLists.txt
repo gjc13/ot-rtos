@@ -3,7 +3,7 @@ cmake_minimum_required (VERSION 3.7)
 project(openthread_freertos)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O2 -ggdb")
-set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -O2 -ggdb")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -ggdb")
 
 #XXX: better way to manage config headers
 add_library(mbedtls-config INTERFACE)
@@ -59,7 +59,6 @@ target_compile_definitions(nrf-sdk-config
 
 add_subdirectory(third_party/nRF5_SDK)
 add_subdirectory(third_party/openthread)
-add_subdirectory(third_party/openthread/third_party/mbedtls)
 add_subdirectory(third_party/jansson/)
 add_subdirectory(third_party/libjwt/)
 add_subdirectory(third_party/lwip)
@@ -159,7 +158,7 @@ target_compile_definitions(ot_cli_nrf52840
         __STACK_SIZE=8192
 )
 
-#sepcial link script
+#special link script
 set_target_properties(ot_cli_nrf52840 PROPERTIES LINK_DEPENDS ${SRC_DIR}/platforms/nrf52840/gcc_nrf52.ld)
 set_target_properties(ot_cli_nrf52840 PROPERTIES LINK_FLAGS "-L ${CMAKE_CURRENT_SOURCE_DIR}/third_party/nRF5_SDK/repo/modules/nrfx/mdk/ -T ${SRC_DIR}/platforms/nrf52840/gcc_nrf52.ld -lc -lnosys -lm -lstdc++")
 
