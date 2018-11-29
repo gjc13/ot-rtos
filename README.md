@@ -33,7 +33,7 @@ You should see http response
 ### Test Mqtt Client
 Please read the [quick start guide](https://cloud.google.com/iot/docs/quickstart) for google cloud iot core first and save your private key, also select RS256 for authentication.
 
-You need to put your client config in `include/applications/google_cloud_iot/client_cfg.h`
+You need to put your client config in `include/apps/google_cloud_iot/client_cfg.h`
 A sample config is given below:
 
 ```

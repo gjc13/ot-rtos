@@ -1,6 +1,6 @@
 [submodule "third_party/openthread"]
-	path = third_party/openthread
-	url = git@github.com:bukepo/openthread.git
+	path = third_party/openthread/repo
+	url = https://github.com/openthread/openthread.git
 [submodule "third_party/lwip"]
 	path = third_party/lwip/repo
 	url = https://git.savannah.nongnu.org/git/lwip.git
