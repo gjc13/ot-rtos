@@ -1,0 +1,103 @@
+cmake_minimum_required (VERSION 3.7)
+
+project(lwip)
+
+set(LWIP_DIR ${CMAKE_CURRENT_SOURCE_DIR}/repo)
+set(LWIP_PORT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/port) 
+set(lwipcore_SRCS
+    ${LWIP_DIR}/src/core/init.c
+    ${LWIP_DIR}/src/core/def.c
+    ${LWIP_DIR}/src/core/dns.c
+    ${LWIP_DIR}/src/core/inet_chksum.c
+    ${LWIP_DIR}/src/core/ip.c
+    ${LWIP_DIR}/src/core/mem.c
+    ${LWIP_DIR}/src/core/memp.c
+    ${LWIP_DIR}/src/core/netif.c
+    ${LWIP_DIR}/src/core/pbuf.c
+    ${LWIP_DIR}/src/core/raw.c
+    ${LWIP_DIR}/src/core/stats.c
+    ${LWIP_DIR}/src/core/sys.c
+    ${LWIP_DIR}/src/core/altcp.c
+    ${LWIP_DIR}/src/core/altcp_alloc.c
+    ${LWIP_DIR}/src/core/altcp_tcp.c
+    ${LWIP_DIR}/src/core/tcp.c
+    ${LWIP_DIR}/src/core/tcp_in.c
+    ${LWIP_DIR}/src/core/tcp_out.c
+    ${LWIP_DIR}/src/core/timeouts.c
+    ${LWIP_DIR}/src/core/udp.c
+)
+
+set(lwipcore4_SRCS
+    ${LWIP_DIR}/src/core/ipv4/autoip.c
+    ${LWIP_DIR}/src/core/ipv4/dhcp.c
+    ${LWIP_DIR}/src/core/ipv4/etharp.c
+    ${LWIP_DIR}/src/core/ipv4/icmp.c
+    ${LWIP_DIR}/src/core/ipv4/igmp.c
+    ${LWIP_DIR}/src/core/ipv4/ip4_frag.c
+    ${LWIP_DIR}/src/core/ipv4/ip4.c
+    ${LWIP_DIR}/src/core/ipv4/ip4_addr.c
+)
+
+set(lwipcore6_SRCS
+    ${LWIP_DIR}/src/core/ipv6/dhcp6.c
+    ${LWIP_DIR}/src/core/ipv6/ethip6.c
+    ${LWIP_DIR}/src/core/ipv6/icmp6.c
+    ${LWIP_DIR}/src/core/ipv6/inet6.c
+    ${LWIP_DIR}/src/core/ipv6/ip6.c
+    ${LWIP_DIR}/src/core/ipv6/ip6_addr.c
+    ${LWIP_DIR}/src/core/ipv6/ip6_frag.c
+    ${LWIP_DIR}/src/core/ipv6/mld6.c
+    ${LWIP_DIR}/src/core/ipv6/nd6.c
+)
+
+# APIFILES: The files which implement the sequential and socket APIs.
+set(lwipapi_SRCS
+    ${LWIP_DIR}/src/api/api_lib.c
+    ${LWIP_DIR}/src/api/api_msg.c
+    ${LWIP_DIR}/src/api/err.c
+    ${LWIP_DIR}/src/api/if_api.c
+    ${LWIP_DIR}/src/api/netbuf.c
+    ${LWIP_DIR}/src/api/netdb.c
+    ${LWIP_DIR}/src/api/netifapi.c
+    ${LWIP_DIR}/src/api/sockets.c
+    ${LWIP_DIR}/src/api/tcpip.c
+)
+
+# Files implementing various generic network interface functions
+set(lwipnetif_SRCS
+    ${LWIP_DIR}/src/netif/ethernet.c
+    ${LWIP_DIR}/src/netif/bridgeif.c
+    ${LWIP_DIR}/src/netif/bridgeif_fdb.c
+    ${LWIP_DIR}/src/netif/slipif.c
+)
+
+set(lwip_SRCS
+    ${lwipcore_SRCS}
+    ${lwipcore4_SRCS}
+    ${lwipcore6_SRCS}
+    ${lwipapi_SRCS}
+    ${lwipnetif_SRCS}
+    ${LWIP_DIR}/src/apps/mqtt/mqtt.c
+    ${LWIP_DIR}/src/apps/altcp_tls/altcp_tls_mbedtls_mem.c
+    ${LWIP_PORT_DIR}/altcp_tls_mbedtls.c
+    ${LWIP_PORT_DIR}/sys_arch.c
+)
+
+add_library(lwip ${lwip_SRCS})
+
+target_include_directories(lwip
+    PUBLIC
+        ${LWIP_DIR}/src/include
+        ${LWIP_PORT_DIR}
+    PRIVATE
+        ${LWIP_DIR}/src
+        ${LWIP_DIR}/src/apps/altcp_tls
+)
+
+target_link_libraries(lwip
+    PUBLIC
+        mbedtls
+        freertos
+    PRIVATE
+        ot_freertos_common
+)

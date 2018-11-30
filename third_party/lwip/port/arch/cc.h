@@ -42,12 +42,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "common/log.h"
 
 /* Plaform specific diagnostic output */
-#define LWIP_PLATFORM_DIAG(x)	do {log x;} while(0)
+#define LWIP_PLATFORM_DIAG(x)	do {printf x;} while(0)
 
-#define LWIP_PLATFORM_ASSERT(x) do {log("Assertion \"%s\" failed at line %d in %s\n", \
+#define LWIP_PLATFORM_ASSERT(x) do {fprintf(stderr, "Assertion \"%s\" failed at line %d in %s\n", \
                                      x, __LINE__, __FILE__); fflush(NULL);} while(0)
 
 #define LWIP_PROVIDE_ERRNO

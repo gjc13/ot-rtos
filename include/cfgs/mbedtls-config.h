@@ -31,10 +31,6 @@
 
 #include <stdlib.h>
 
-#include <openthread/config.h>
-#include <openthread/platform/logging.h>
-#include <openthread/platform/memory.h>
-
 #if defined(_WIN32)
 #include <stdarg.h>
 #include <stdio.h>
@@ -113,10 +109,8 @@ __inline void mbedtls_platform_zeroize( void *buf, size_t len)
 #define MBEDTLS_SSL_PROTO_DTLS
 #define MBEDTLS_SSL_TLS_C
 
-#if OPENTHREAD_ENABLE_BORDER_AGENT || OPENTHREAD_ENABLE_COMMISSIONER || OPENTHREAD_ENABLE_APPLICATION_COAP_SECURE
 #define MBEDTLS_SSL_COOKIE_C
 #define MBEDTLS_SSL_SRV_C
-#endif
 
 #define MBEDTLS_KEY_EXCHANGE_PSK_ENABLED
 #define MBEDTLS_KEY_EXCHANGE_ECDHE_ECDSA_ENABLED
@@ -148,19 +142,9 @@ __inline void mbedtls_platform_zeroize( void *buf, size_t len)
 #define MBEDTLS_ECP_FIXED_POINT_OPTIM      0 /**< Enable fixed-point speed-up */
 #define MBEDTLS_ENTROPY_MAX_SOURCES        1 /**< Maximum number of sources supported */
 
-#if OPENTHREAD_ENABLE_MULTIPLE_INSTANCES
-#define MBEDTLS_PLATFORM_STD_CALLOC      otPlatCAlloc /**< Default allocator to use, can be undefined */
-#define MBEDTLS_PLATFORM_STD_FREE        otPlatFree /**< Default free to use, can be undefined */
-#else
 #define MBEDTLS_MEMORY_BUFFER_ALLOC_C
-#endif
 
 #define MBEDTLS_SSL_MAX_CONTENT_LEN      2464 /**< Maxium fragment length in bytes */
-//#if OPENTHREAD_ENABLE_APPLICATION_COAP_SECURE
-//#define MBEDTLS_SSL_MAX_CONTENT_LEN      900 /**< Maxium fragment length in bytes */
-//#else
-//#define MBEDTLS_SSL_MAX_CONTENT_LEN      768 /**< Maxium fragment length in bytes */
-//#endif
 
 #define MBEDTLS_SSL_CIPHERSUITES         MBEDTLS_TLS_ECJPAKE_WITH_AES_128_CCM_8
 
