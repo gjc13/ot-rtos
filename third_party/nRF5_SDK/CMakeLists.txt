@@ -13,7 +13,7 @@ set_source_files_properties(
     ${CMAKE_CURRENT_SOURCE_DIR}/repo/modules/nrfx/mdk/gcc_startup_nrf52840.S
     PROPERTIES COMPILE_FLAGS "-x assembler-with-cpp")
 
-set(NRF_DRIVER_SRCS 
+set(NRF_DRIVER_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/repo/modules/nrfx/mdk/gcc_startup_nrf52840.S
     ${CMAKE_CURRENT_SOURCE_DIR}/repo/components/libraries/log/src/nrf_log_frontend.c
     ${CMAKE_CURRENT_SOURCE_DIR}/repo/components/libraries/log/src/nrf_log_str_formatter.c
@@ -55,7 +55,7 @@ target_link_libraries(nrf_driver
         nrf-sdk-config
 )
 
-target_include_directories(nrf_driver 
+target_include_directories(nrf_driver
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/repo/components
         ${CMAKE_CURRENT_SOURCE_DIR}/repo/modules/nrfx/mdk
@@ -98,30 +98,21 @@ set_property(TARGET nrf_cc310 PROPERTY IMPORTED_LOCATION
 )
 
 set(FREERTOS_SRCS
-    ${CMAKE_CURRENT_SOURCE_DIR}/repo/external/freertos/source/croutine.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/repo/external/freertos/source/event_groups.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/repo/external/freertos/source/portable/MemMang/heap_3.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/repo/external/freertos/source/list.c
     ${CMAKE_CURRENT_SOURCE_DIR}/repo/external/freertos/portable/GCC/nrf52/port.c
     ${CMAKE_CURRENT_SOURCE_DIR}/repo/external/freertos/portable/CMSIS/nrf52/port_cmsis.c
     ${CMAKE_CURRENT_SOURCE_DIR}/repo/external/freertos/portable/CMSIS/nrf52/port_cmsis_systick.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/repo/external/freertos/source/queue.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/repo/external/freertos/source/stream_buffer.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/repo/external/freertos/source/tasks.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/repo/external/freertos/source/timers.c
 )
 
-add_library(freertos ${FREERTOS_SRCS})
+add_library(freertos-portable ${FREERTOS_SRCS})
 
-target_include_directories(freertos
+target_include_directories(freertos-portable
     PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/repo/external/freertos/source/include
         ${CMAKE_CURRENT_SOURCE_DIR}/repo/external/freertos/portable/GCC/nrf52
         ${CMAKE_CURRENT_SOURCE_DIR}/repo/external/freertos/portable/CMSIS/nrf52
 )
 
-target_link_libraries(freertos
+target_link_libraries(freertos-portable
     PUBLIC
         nrf_driver
-        freertos-config
+        freertos
 )

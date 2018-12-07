@@ -31,13 +31,7 @@ target_compile_definitions(openthread-config
         OPENTHREAD_CONFIG_LOG_PLATFORM=1
         OPENTHREAD_FTD=1
         OPENTHREAD_PROJECT_CORE_CONFIG_FILE=\"openthread-core-nrf52840-config.h\"
-        SPINEL_PLATFORM_HEADER=\"spinel_platform.h\" 
-)
-
-add_library(freertos-config INTERFACE)
-target_include_directories(freertos-config
-    INTERFACE
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/cfgs
+        SPINEL_PLATFORM_HEADER=\"spinel_platform.h\"
 )
 
 add_library(nrf-sdk-config INTERFACE)
@@ -57,10 +51,11 @@ target_compile_definitions(nrf-sdk-config
         NRF52840_XXAA
 )
 
+add_subdirectory(third_party/freertos)
 add_subdirectory(third_party/nRF5_SDK)
 add_subdirectory(third_party/openthread)
-add_subdirectory(third_party/jansson/)
-add_subdirectory(third_party/libjwt/)
+add_subdirectory(third_party/jansson)
+add_subdirectory(third_party/libjwt)
 add_subdirectory(third_party/lwip)
 
 set(OT_PLATFORM_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/platforms/nrf52840)
@@ -116,6 +111,7 @@ target_link_libraries(ot_freertos_common
     PUBLIC
         mbedtls
         freertos
+        freertos-portable
         nrf_driver
         openthread_platform_api
 )
@@ -162,8 +158,8 @@ target_compile_definitions(ot_cli_nrf52840
 set_target_properties(ot_cli_nrf52840 PROPERTIES LINK_DEPENDS ${SRC_DIR}/platforms/nrf52840/gcc_nrf52.ld)
 set_target_properties(ot_cli_nrf52840 PROPERTIES LINK_FLAGS "-L ${CMAKE_CURRENT_SOURCE_DIR}/third_party/nRF5_SDK/repo/modules/nrfx/mdk/ -T ${SRC_DIR}/platforms/nrf52840/gcc_nrf52.ld -lc -lnosys -lm -lstdc++")
 
-#build hex file 
-add_custom_command(OUTPUT ot_cli_nrf52840.hex 
+#build hex file
+add_custom_command(OUTPUT ot_cli_nrf52840.hex
     COMMAND arm-none-eabi-objcopy -O ihex ot_cli_nrf52840 ot_cli_nrf52840.hex
     DEPENDS ot_cli_nrf52840
 )
