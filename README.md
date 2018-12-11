@@ -10,6 +10,7 @@ Get Started
 git submodule update --init
 mkdir build && cd build
 cmake .. -DCMAKE_TOOLCHAIN_FILE=../cmake/arm-none-eabi.cmake
+make -j12
 ```
 
 This will build the demo application of OpenThread command line in `build/ot_cli_nrf52840`, you can use the command line application by connecting to the serial port of NRF52840.
