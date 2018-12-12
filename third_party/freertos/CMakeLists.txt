@@ -20,5 +20,6 @@ target_include_directories(freertos
 
 target_link_libraries(freertos
     PUBLIC
+        openthread_nordicsemi
         freertos_portable
 )

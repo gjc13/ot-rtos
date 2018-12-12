@@ -40,8 +40,28 @@ set_property(TARGET openthread_nrf52840_sdk PROPERTY IMPORTED_LOCATION ${BINARY_
 add_library(openthread_nrf52840_softdevice_sdk STATIC IMPORTED)
 set_property(TARGET openthread_nrf52840_softdevice_sdk PROPERTY IMPORTED_LOCATION ${BINARY_DIR}/output/nrf52840/lib/libopenthread-nrf52840-softdevice-sdk.a)
 
+add_library(openthread_nordicsemi INTERFACE)
+target_include_directories(openthread_nordicsemi INTERFACE
+    ${BINARY_DIR}/output/include
+    ${BINARY_DIR}/build/nrf52840/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/cmsis
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/dependencies
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/drivers/clock
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/libraries/app_error
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/libraries/crypto
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/libraries/nrf_cc310/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/nrfx
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/nrfx/drivers/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/nrfx/hal
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/nrfx/mdk)
+
+target_compile_definitions(openthread_nordicsemi INTERFACE
+    CONFIG_GPIO_AS_PINRESET
+    NRF52840_XXAA)
+
+add_dependencies(openthread_nordicsemi ot)
+
 add_library(openthread INTERFACE)
-add_dependencies(openthread ot)
 target_link_libraries(openthread INTERFACE
     openthread_cli_ftd
     openthread_diag
@@ -51,6 +71,7 @@ target_link_libraries(openthread INTERFACE
     openthread_nrf52840_sdk
     openthread_nrf52840_softdevice_sdk
     openthread_platform_utils
+    openthread_nordicsemi
     nrf_cc310)
 
 target_compile_options(openthread INTERFACE
@@ -65,21 +86,9 @@ target_compile_options(openthread INTERFACE
     -DNRF52840_XXAA)
 
 target_include_directories(openthread INTERFACE
-    ${BINARY_DIR}/build/nrf52840/include
-    ${BINARY_DIR}/output/include
     ${CMAKE_CURRENT_SOURCE_DIR}/repo/examples/platforms
     ${CMAKE_CURRENT_SOURCE_DIR}/repo/examples/platforms/nrf52840
     ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core
     ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/mbedtls
     ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/mbedtls/repo/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/mbedtls/repo/include/mbedtls
-    ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/cmsis
-    ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/dependencies
-    ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/drivers/clock
-    ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/libraries/app_error
-    ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/libraries/crypto
-    ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/libraries/nrf_cc310/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/nrfx
-    ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/nrfx/drivers/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/nrfx/hal
-    ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/nrfx/mdk)
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/mbedtls/repo/include/mbedtls)

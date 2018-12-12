@@ -6,11 +6,11 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O2 -ggdb")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -ggdb")
 
 add_subdirectory(third_party/freertos)
-add_subdirectory(third_party/nRF5_SDK)
 add_subdirectory(third_party/openthread)
 add_subdirectory(third_party/jansson)
 add_subdirectory(third_party/libjwt)
 add_subdirectory(third_party/lwip)
+add_subdirectory(third_party/freertos_portable)
 
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
@@ -32,7 +32,6 @@ target_include_directories(platform
 target_link_libraries(platform
     PUBLIC
         lwip
-        freertos
         freertos_portable
         openthread
 )
@@ -49,7 +48,7 @@ add_executable(ot_cli_nrf52840 ${SRC_DIR}/examples/ot_cli/main.c)
 
 target_link_libraries(ot_cli_nrf52840
     PUBLIC
-        test
+        test_app
 )
 
 target_compile_definitions(ot_cli_nrf52840
