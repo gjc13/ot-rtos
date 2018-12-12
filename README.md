@@ -25,7 +25,7 @@ channel 15
 networkname OpenThreadDemo
 ifconfig up
 thread start
-diag http
+test http
 ```
 
 You should see http response
@@ -111,4 +111,4 @@ A sample config is given below:
 
 `CLOUDIOT_CERT` is the first certificate from [https://pki.google.com/roots.pem](https://pki.google.com/roots.pem)
 
-You can use command `diag mqtt` to test connect and publish a message to Google Cloud IoT core.
+You can use command `test mqtt` to test connect and publish a message to Google Cloud IoT core.

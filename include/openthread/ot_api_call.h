@@ -40,23 +40,6 @@
 extern "C" {
 #endif
 
-/**
- * This macro provides a thread-safe way to call OpenThread api in other threads
- *
- *  @param[in]  ...    function call statement of OpenThread api
- *
- */
-#define OT_API_CALL(...) \
-    do                   \
-    {                    \
-        otxLock();       \
-        __VA_ARGS__;     \
-        otxUnlock();     \
-        otxTaskNotifyGive();   \
-    } while (0)
-
-#endif
-
 #ifdef __cplusplus
 } // extern "C"
 #endif // OT_API_MUTEX_H_

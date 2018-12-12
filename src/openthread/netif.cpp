@@ -31,7 +31,7 @@
  *   This file implements lwip net interface with OpenThread.
  */
 
-#include "platform-nrf5.h"
+#include "openthread/openthread-freertos.h"
 
 #include <lwip/netif.h>
 #include <lwip/tcpip.h>
@@ -52,6 +52,8 @@
 
 #include "lwip/dns.h"
 #include "lwip/sockets.h"
+
+#include "netif.h"
 
 static const size_t  kMaxIp6Size            = 1500;
 static const uint8_t kMulticastPrefixLength = 128;
@@ -194,11 +196,11 @@ exit:
     UNLOCK_TCPIP_CORE();
 }
 
-static void setupDns()
+static void setupDns(void)
 {
     ip_addr_t dnsServer;
 
-    inet_pton(AF_INET6, "2001:db8:1:ffff::808:808", &dnsServer.u_addr.ip6.addr);
+    inet_pton(AF_INET6, "64:ff9b::808:808", &dnsServer.u_addr.ip6.addr);
     dnsServer.type            = IPADDR_TYPE_V6;
     dnsServer.u_addr.ip6.zone = IP6_NO_ZONE;
 
@@ -217,7 +219,6 @@ static void processStateChange(otChangedFlags aFlags, void *aContext)
         {
             otLogInfoPlat("netif up");
             netif_set_up(&sNetif);
-            // setupDns();
         }
         else
         {
@@ -335,7 +336,7 @@ exit:
     }
 }
 
-void otxNetifInit(void *aContext)
+void netifInit(void *aContext)
 {
     otInstance *instance = static_cast<otInstance *>(aContext);
 
@@ -362,7 +363,7 @@ void otxNetifInit(void *aContext)
     setupDns();
 }
 
-void otxNetifProcess(otInstance *aInstance)
+void netifProcess(otInstance *aInstance)
 {
     if (sGuardOutput != NULL && xSemaphoreTake(sGuardOutput, portMAX_DELAY) == pdTRUE)
     {

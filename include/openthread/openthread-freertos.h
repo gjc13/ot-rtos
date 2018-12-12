@@ -35,6 +35,8 @@
 #ifndef OPENTHREAD_FREERTOS
 #define OPENTHREAD_FREERTOS
 
+#include <FreeRTOS.h>
+#include <portmacro.h>
 #include <openthread/instance.h>
 
 #ifdef __cplusplus
@@ -77,9 +79,56 @@ void otxLock(void);
 void otxUnlock(void);
 
 /**
+ * This function initializes user application.
+ */
+void otxUserInit(void);
+
+/**
  * This function gets ot instance
  */
 otInstance *otxGetInstance();
+
+#ifndef portFORCE_INLINE
+#define portFORCE_INLINE inline __attribute__((always_inline))
+#endif
+/**
+ * This function returns if it is in ISR context.
+ *
+ */
+portFORCE_INLINE static BaseType_t otxPortIsInsideInterrupt(void)
+{
+    uint32_t   ulCurrentInterrupt;
+    BaseType_t xReturn;
+
+    /* Obtain the number of the currently executing interrupt. */
+    __asm volatile("mrs %0, ipsr" : "=r"(ulCurrentInterrupt)::"memory");
+
+    if (ulCurrentInterrupt == 0)
+    {
+        xReturn = pdFALSE;
+    }
+    else
+    {
+        xReturn = pdTRUE;
+    }
+
+    return xReturn;
+}
+
+/**
+ * This macro provides a thread-safe way to call OpenThread api in other threads
+ *
+ *  @param[in]  ...    function call statement of OpenThread api
+ *
+ */
+#define OT_API_CALL(...)     \
+    do                       \
+    {                        \
+        otxLock();           \
+        __VA_ARGS__;         \
+        otxUnlock();         \
+        otxTaskNotifyGive(); \
+    } while (0)
 
 #ifdef __cplusplus
 }

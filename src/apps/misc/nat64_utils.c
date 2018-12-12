@@ -1,5 +1,4 @@
 #include "apps/misc/nat64_utils.h"
-#include "common/log.h"
 
 #include "lwip/netdb.h"
 
@@ -30,6 +29,5 @@ int dnsNat64Address(const char *aHostName, ip6_addr_t *aAddrOut)
         ret       = 0;
     }
 
-    // log("Dns done\r\n");
     return ret;
 }

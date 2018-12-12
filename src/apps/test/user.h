@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2017, The OpenThread Authors.
+ *  Copyright (c) 2018, The OpenThread Authors.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -26,33 +26,23 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <openthread/config.h>
-#include <openthread-core-config.h>
+#ifndef USER_TEST_H
+#define USER_TEST_H
 
-#include <stdint.h>
-#include <string.h>
-#include <assert.h>
+#include <FreeRTOS.h>
+#include <task.h>
 
-#include <utils/code_utils.h>
-#include <utils/flash.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#include "hal/nrf_nvmc.h"
-#include "platform-nrf5.h"
+extern TaskHandle_t gTestTask;
 
-otError nrf5FlashPageErase(uint32_t aAddress)
-{
-    nrf_nvmc_page_erase(aAddress);
+void httpTask(void *p);
+void mqttTask(void *p);
 
-    return OT_ERROR_NONE;
+#ifdef __cplusplus
 }
+#endif
 
-bool nrf5FlashIsBusy(void)
-{
-    return NRF_NVMC->READY != NVMC_READY_READY_Ready;
-}
-
-uint32_t nrf5FlashWrite(uint32_t aAddress, uint8_t *aData, uint32_t aSize)
-{
-    nrf_nvmc_write_bytes(aAddress, aData, aSize);
-    return aSize;
-}
+#endif // USER_TEST_H

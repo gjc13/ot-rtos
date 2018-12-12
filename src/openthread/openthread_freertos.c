@@ -26,28 +26,26 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "platform-config.h"
-
 #include <openthread-core-config.h>
 
+#include <openthread/openthread-freertos.h>
+
 #include <assert.h>
+#include <stdio.h>
 
 #include <FreeRTOS.h>
 #include <task.h>
 
+#include <lwip/netdb.h>
 #include <lwip/tcpip.h>
 
-#include <openthread/cli.h>
 #include <openthread/diag.h>
 #include <openthread/tasklet.h>
 
 #include "openthread-system.h"
-#include "platform-nrf5.h"
 
-#include "common/default_uart.h"
-#include "common/log.h"
+#include "netif.h"
 #include "apps/misc/nat64_utils.h"
-#include "lwip/netdb.h"
 
 static TaskHandle_t      sMainTask     = NULL;
 static SemaphoreHandle_t sExternalLock = NULL;
@@ -58,43 +56,25 @@ static void setupNat64()
     ip6_addr_t nat64Prefix;
 
     nat64Prefix.zone = 0;
-    inet_pton(AF_INET6, "2001:db8:1:ffff::0", nat64Prefix.addr);
+    inet_pton(AF_INET6, "64:ff9b::", nat64Prefix.addr);
     setNat64Prefix(&nat64Prefix);
 }
 
-static void mainloop(void *p)
+static void mainloop(void *aContext)
 {
-    (void)p;
+    otInstance *instance = (otInstance *)aContext;
 
-    sExternalLock = xSemaphoreCreateMutex();
-
-    assert(sExternalLock != NULL);
-pseudo_reset:
-
-    sInstance = otInstanceInitSingle();
-    assert(sInstance);
-
-    otCliUartInit(sInstance);
-
-#if OPENTHREAD_ENABLE_DIAG
-    otDiagInit(sInstance);
-#endif
-
-    tcpip_init(otxNetifInit, sInstance);
-    setupNat64();
     while (!otSysPseudoResetWasRequested())
     {
-        otTaskletsProcess(sInstance);
-        otSysProcessDrivers(sInstance);
+        otTaskletsProcess(instance);
+        otSysProcessDrivers(instance);
+        netifProcess(instance);
         xSemaphoreGive(sExternalLock);
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
         xSemaphoreTake(sExternalLock, portMAX_DELAY);
     }
 
     otInstanceFinalize(sInstance);
-
-    goto pseudo_reset;
-
     vTaskDelete(NULL);
 }
 
@@ -118,23 +98,30 @@ void otxTaskNotifyGiveFromISR()
 void otTaskletsSignalPending(otInstance *aInstance)
 {
     otxTaskNotifyGive();
-    (void)aInstance;
+    // TODO aInstance != sInstance
+    // assert(aInstance == sInstance);
 }
 
 void otxInit(int argc, char *argv[])
 {
-    /* Initialize clock driver for better time accuracy in FREERTOS */
-    APP_ERROR_CHECK(nrf_drv_clock_init());
-    defaultUartInit(NULL);
-
     otSysInit(argc, argv);
+
+    sInstance = otInstanceInitSingle();
+    assert(sInstance);
+
+#if OPENTHREAD_ENABLE_DIAG
+    otDiagInit(sInstance);
+#endif
+    tcpip_init(netifInit, sInstance);
+    setupNat64();
+
+    sExternalLock = xSemaphoreCreateMutex();
+    assert(sExternalLock != NULL);
 }
 
 void otxStart(void)
 {
-    UNUSED_VARIABLE(xTaskCreate(mainloop, "ot", 4096, NULL, 2, &sMainTask));
-    getDefaultUartIO()->mTaskToWake = sMainTask;
-
+    xTaskCreate(mainloop, "ot", 4096, sInstance, 2, &sMainTask);
     // Activate deep sleep mode
     SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
     vTaskStartScheduler();
@@ -142,12 +129,30 @@ void otxStart(void)
 
 void otxLock(void)
 {
-    xSemaphoreTake(sExternalLock, portMAX_DELAY);
+    if (xTaskGetCurrentTaskHandle() != sMainTask)
+    {
+        xSemaphoreTake(sExternalLock, portMAX_DELAY);
+    }
 }
 
 void otxUnlock(void)
 {
-    xSemaphoreGive(sExternalLock);
+    if (xTaskGetCurrentTaskHandle() != sMainTask)
+    {
+        xSemaphoreGive(sExternalLock);
+    }
+}
+
+void otSysEventSignalPending(void)
+{
+    if (otxPortIsInsideInterrupt())
+    {
+        otxTaskNotifyGiveFromISR();
+    }
+    else
+    {
+        otxTaskNotifyGive();
+    }
 }
 
 otInstance *otxGetInstance()

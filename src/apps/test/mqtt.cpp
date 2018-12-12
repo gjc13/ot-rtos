@@ -1,3 +1,5 @@
+#include "user.h"
+
 #include "lwip/altcp.h"
 #include "lwip/altcp_tls.h"
 #include "lwip/netdb.h"
@@ -10,10 +12,10 @@
 
 #include "apps/google_cloud_iot/client_cfg.h"
 #include "apps/google_cloud_iot/mqtt_client.hpp"
-#include "apps/google_cloud_iot/mqtt_test.h"
 #include "apps/misc/nat64_utils.h"
 #include "apps/misc/time_ntp.h"
-#include "common/log.h"
+
+#include <openthread/openthread-freertos.h>
 
 #define MQTT_CLIENT_NOTIFY_VALUE (1 << 9)
 
@@ -40,11 +42,11 @@ void GoogleCloudIotMqttClient::mqttPubChanged(void *aArg, err_t aResult)
 
     if (aResult == ERR_OK)
     {
-        log("Publish done\r\n");
+        printf("Publish done\r\n");
     }
     else
     {
-        log("Publish get error %d\r\n", aResult);
+        printf("Publish get error %d\r\n", aResult);
     }
 }
 
@@ -54,7 +56,7 @@ void GoogleCloudIotMqttClient::mqttConnectChanged(mqtt_client_t *aClient, void *
 
     if (aResult == MQTT_CONNECT_ACCEPTED)
     {
-        log("Mqtt Connected\r\n");
+        printf("Mqtt Connected\r\n");
     }
 
     if (aResult != MQTT_CONNECT_DISCONNECTED)
@@ -91,27 +93,27 @@ static const char *CreateJwt(const char *aPrivKey, const char *aProjectId, jwt_a
     ret = jwt_add_grant(jwt, "iat", iatTime);
     if (ret)
     {
-        log("Error setting issue timestamp: %d\r\n", ret);
+        printf("Error setting issue timestamp: %d\r\n", ret);
     }
     ret = jwt_add_grant(jwt, "exp", expTime);
     if (ret)
     {
-        log("Error setting expiration: %d\r\n", ret);
+        printf("Error setting expiration: %d\r\n", ret);
     }
     ret = jwt_add_grant(jwt, "aud", aProjectId);
     if (ret)
     {
-        log("Error adding audience: %d\r\n", ret);
+        printf("Error adding audience: %d\r\n", ret);
     }
     ret = jwt_set_alg(jwt, aAlgorithm, reinterpret_cast<const uint8_t *>(key), keyLen);
     if (ret)
     {
-        log("Error during set alg: %d\r\n", ret);
+        printf("Error during set alg: %d\r\n", ret);
     }
     out = jwt_encode_str(jwt);
     if (!out)
     {
-        log("Error during token creation:\r\n");
+        printf("Error during token creation:\r\n");
     }
 
     jwt_free(jwt);
@@ -195,11 +197,14 @@ GoogleCloudIotMqttClient::~GoogleCloudIotMqttClient()
 
 void mqttTask(void *p)
 {
-    log("Mqtt task\r\n");
-
     static uint8_t message[8] = "Hello";
     (void)p;
+    int count = 10;
+
     ot::app::GoogleCloudIotClientCfg cfg;
+
+    printf("Mqtt task\r\n");
+
     cfg.mAddress         = CLOUDIOT_SERVER_ADDRESS;
     cfg.mClientId        = CLOUDIOT_CLIENT_ID;
     cfg.mDeviceId        = CLOUDIOT_DEVICE_ID;
@@ -214,13 +219,16 @@ void mqttTask(void *p)
 
     client.Connect();
 
-    log("Connect done \n");
+    printf("Connect done \n");
 
     client.Publish("/devices/test-device/events", message, sizeof(message));
 
-    while (true)
+    while (count--)
     {
-        log("tick\n");
+        printf("tick\n");
         vTaskDelay(10000);
     }
+
+    gTestTask = NULL;
+    vTaskDelete(NULL);
 }

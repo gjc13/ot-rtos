@@ -6,8 +6,7 @@ set(FREERTOS_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/repo/FreeRTOS/Source/queue.c
     ${CMAKE_CURRENT_SOURCE_DIR}/repo/FreeRTOS/Source/stream_buffer.c
     ${CMAKE_CURRENT_SOURCE_DIR}/repo/FreeRTOS/Source/tasks.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/repo/FreeRTOS/Source/timers.c
-)
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/FreeRTOS/Source/timers.c)
 
 add_library(freertos ${FREERTOS_SRCS})
 
@@ -20,6 +19,6 @@ target_include_directories(freertos
 )
 
 target_link_libraries(freertos
-    PRIVATE
-        freertos-portable
+    PUBLIC
+        freertos_portable
 )

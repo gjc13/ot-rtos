@@ -21,7 +21,6 @@ target_include_directories(libjwt
 
 target_link_libraries(libjwt
     PRIVATE
-        ot_freertos_common
-        mbedtls
         jansson
+        platform
 )

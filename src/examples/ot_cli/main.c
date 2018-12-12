@@ -28,19 +28,42 @@
 
 #include <openthread/openthread-freertos.h>
 
-#include "common/log.h"
+#include <errno.h>
+#include <openthread/cli.h>
+#include <openthread/platform/uart.h>
+
+#define STDOUT_FILENO 1
+#define STDERR_FILENO 2
 
 void _exit(int status)
 {
-    log("exit");
+    printf("exit");
     while (1)
         ;
+}
+
+int _write(int file, const char *p_char, int len)
+{
+    int ret = len;
+
+    if (file == STDOUT_FILENO || file == STDERR_FILENO)
+    {
+        OT_API_CALL(otCliUartOutput(p_char, len));
+    }
+    else
+    {
+        errno = EBADF;
+        ret   = -1;
+    }
+
+    return ret;
 }
 
 int main(int argc, char *argv[])
 {
     otxInit(argc, argv);
-
+    otCliUartInit(otxGetInstance());
+    otxUserInit();
     otxStart();
     return 0;
 }

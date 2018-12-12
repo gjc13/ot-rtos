@@ -96,8 +96,8 @@ target_include_directories(lwip
 
 target_link_libraries(lwip
     PUBLIC
-        mbedtls
         freertos
     PRIVATE
-        ot_freertos_common
+        openthread
+        platform
 )

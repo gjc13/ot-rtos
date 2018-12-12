@@ -7,10 +7,8 @@
 #include "lwip/netdb.h"
 
 #include "apps/misc/nat64_utils.h"
-#include "common/log.h"
 #include "openthread/ip6.h"
 #include "openthread/openthread-freertos.h"
-#include "openthread/ot_api_call.h"
 #include "openthread/sntp.h"
 
 #define NTP_NOTIFY_VALUE (1 << 11)
@@ -60,7 +58,6 @@ uint64_t timeNtp()
         {
             ctx.mTime = 0;
         }
-        // log("Sntp got time %llu\r\n", ctx.mTime);
     }
     else
     {
