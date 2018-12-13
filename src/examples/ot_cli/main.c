@@ -35,13 +35,6 @@
 #define STDOUT_FILENO 1
 #define STDERR_FILENO 2
 
-void _exit(int status)
-{
-    printf("exit");
-    while (1)
-        ;
-}
-
 int _write(int file, const char *p_char, int len)
 {
     int ret = len;

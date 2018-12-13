@@ -372,6 +372,7 @@ sys_prot_t sys_arch_protect(void)
 
 void sys_arch_unprotect(sys_prot_t pval)
 {
+    (void)pval;
     sys_mutex_unlock(&g_lwip_protect_mutex);
 }
 

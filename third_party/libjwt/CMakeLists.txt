@@ -12,6 +12,13 @@ set(LIBJWT_SRC_FILES
 
 add_library(libjwt ${LIBJWT_SRC_FILES})
 
+target_compile_options(libjwt PRIVATE
+    -Wno-unused-parameter
+    -Wno-pointer-sign
+    -Wno-unused-variable
+    -Wno-type-limits
+    -Wno-unused-function)
+
 target_include_directories(libjwt
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/repo/include

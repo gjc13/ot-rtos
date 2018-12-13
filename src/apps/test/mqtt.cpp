@@ -52,6 +52,8 @@ void GoogleCloudIotMqttClient::mqttPubChanged(void *aArg, err_t aResult)
 
 void GoogleCloudIotMqttClient::mqttConnectChanged(mqtt_client_t *aClient, void *aArg, mqtt_connection_status_t aResult)
 {
+    (void)aClient;
+
     ConnectContext *ctx = static_cast<ConnectContext *>(aArg);
 
     if (aResult == MQTT_CONNECT_ACCEPTED)
@@ -70,8 +72,8 @@ static void GetIatExp(char *aIat, char *aExt, int time_size)
 {
     time_t now_seconds = timeNtp();
 
-    snprintf(aIat, (size_t)time_size, "%lu", now_seconds);
-    snprintf(aExt, (size_t)time_size, "%lu", now_seconds + 3600);
+    snprintf(aIat, (size_t)time_size, "%zu", (size_t)now_seconds);
+    snprintf(aExt, (size_t)time_size, "%zu", (size_t)(now_seconds + 3600));
 }
 
 static const char *CreateJwt(const char *aPrivKey, const char *aProjectId, jwt_alg_t aAlgorithm)

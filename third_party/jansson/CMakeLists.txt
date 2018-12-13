@@ -18,6 +18,10 @@ set(JANSSON_SRC_FILES
 
 add_library(jansson ${JANSSON_SRC_FILES})
 
+target_compile_options(jansson PRIVATE
+    -Wno-unused-parameter
+    -Wno-unused-function)
+
 target_compile_definitions(jansson
     PUBLIC
         HAVE_CONFIG_H

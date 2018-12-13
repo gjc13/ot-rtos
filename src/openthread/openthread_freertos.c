@@ -97,6 +97,7 @@ void otxTaskNotifyGiveFromISR()
 
 void otTaskletsSignalPending(otInstance *aInstance)
 {
+    (void)aInstance;
     otxTaskNotifyGive();
     // TODO aInstance != sInstance
     // assert(aInstance == sInstance);

@@ -2,8 +2,9 @@ cmake_minimum_required (VERSION 3.7)
 
 project(openthread_freertos)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O2 -ggdb")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -ggdb")
+set(COMMON_FLAGS "-Os -g -fdata-sections -ffunction-sections  -Wall -Wextra -Wshadow -Werror -Wl,--gc-sections")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${COMMON_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMMON_FLAGS} -std=gnu++98 -Wno-c++14-compat -fno-exceptions -fno-rtti")
 
 add_subdirectory(third_party/freertos)
 add_subdirectory(third_party/openthread)

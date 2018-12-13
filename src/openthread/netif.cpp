@@ -82,11 +82,14 @@ static bool IsLinkLocal(const struct otIp6Address &aAddress)
 static void HandleNetifStatus(struct netif *aNetif)
 {
     // TODO process events from lwip
+    (void)aNetif;
     otLogInfoPlat("LwIP netif event");
 }
 
 static err_t netifOutputIp6(struct netif *aNetif, struct pbuf *aBuffer, const ip6_addr_t *aPeerAddr)
 {
+    (void)aPeerAddr;
+
     err_t        err   = ERR_OK;
     OutputEvent *event = NULL;
 
@@ -231,6 +234,8 @@ static void processStateChange(otChangedFlags aFlags, void *aContext)
 
 static void processAddress(const otIp6Address *aAddress, uint8_t aPrefixLength, bool aIsAdded, void *aContext)
 {
+    (void)aContext;
+
     otLogInfoPlat("address changed");
 
     if (aPrefixLength != kMulticastPrefixLength)

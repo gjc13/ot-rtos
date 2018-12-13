@@ -10,6 +10,11 @@ TaskHandle_t gTestTask = NULL;
 
 static void ProcessTest(int argc, char *argv[])
 {
+    if (argc < 1)
+    {
+        return;
+    }
+
     if (gTestTask != NULL)
     {
         otCliUartAppendResult(OT_ERROR_BUSY);
@@ -24,7 +29,7 @@ static void ProcessTest(int argc, char *argv[])
     }
 }
 
-static const struct otCliCommand sCommands[] = {"test", ProcessTest};
+static const struct otCliCommand sCommands[] = {{"test", ProcessTest}};
 
 void otxUserInit(void)
 {
