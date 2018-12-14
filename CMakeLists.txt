@@ -60,6 +60,7 @@ target_compile_options(otr_common_utils
 
 add_library(otr_core
     ${SRC_DIR}/openthread/netif.cpp
+    ${SRC_DIR}/openthread/uart_lock.c
     ${SRC_DIR}/openthread/openthread_freertos.c
 )
 

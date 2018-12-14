@@ -57,7 +57,7 @@ int _write(int file, const char *p_char, int len)
 
     if (file == STDOUT_FILENO || file == STDERR_FILENO)
     {
-        OT_API_CALL(otCliUartOutput(p_char, len));
+        otCliUartOutput(p_char, len);
     }
     else
     {

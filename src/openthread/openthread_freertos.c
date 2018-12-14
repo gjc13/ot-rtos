@@ -43,6 +43,8 @@
 #include <openthread/tasklet.h>
 #include <openthread-system.h>
 
+#include "openthread/uart_lock.h"
+
 #include "netif.h"
 #include "apps/misc/nat64_utils.h"
 #include "portable/portable.h"
@@ -126,6 +128,7 @@ void otrInit(int argc, char *argv[])
 #if PLATFORM_linux_radio
     sInstance = otSysInit(argc, argv);
 #else
+    otrUartLockInit();
     otSysInit(argc, argv);
 
     sInstance = otInstanceInitSingle();
