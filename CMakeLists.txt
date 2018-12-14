@@ -28,6 +28,7 @@ add_subdirectory(third_party/freertos)
 add_subdirectory(third_party/freertos_portable)
 add_subdirectory(third_party/freertos-addons)
 add_subdirectory(third_party/openthread)
+add_subdirectory(third_party/openweave-core)
 add_subdirectory(third_party/jansson)
 add_subdirectory(third_party/libjwt)
 add_subdirectory(third_party/lwip)
@@ -62,6 +63,7 @@ add_library(otr_core
     ${SRC_DIR}/openthread/netif.cpp
     ${SRC_DIR}/openthread/uart_lock.c
     ${SRC_DIR}/openthread/openthread_freertos.c
+    ${SRC_DIR}/openthread/uart_lock.c
 )
 
 target_include_directories(otr_core
@@ -88,6 +90,9 @@ target_link_libraries(otr_frameworks
         otr_core
         jansson
         libjwt
+        lwip
+        openthread
+        openweave
 )
 
 target_compile_options(otr_frameworks

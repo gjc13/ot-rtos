@@ -4,7 +4,9 @@ add_library(test_app
     ${CMAKE_CURRENT_SOURCE_DIR}/http.c
     ${CMAKE_CURRENT_SOURCE_DIR}/mqtt.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/tcp_utils.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/user.c)
+    ${CMAKE_CURRENT_SOURCE_DIR}/user.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/weave_pair.cpp
+)
 
 target_link_libraries(test_app
     PUBLIC

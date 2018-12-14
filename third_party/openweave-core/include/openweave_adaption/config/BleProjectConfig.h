@@ -1,0 +1,17 @@
+#ifndef BLE_PROJECT_CONFIG_H
+#define BLE_PROJECT_CONFIG_H
+
+// ==================== Platform Adaptations ====================
+
+#define BLE_CONNECTION_OBJECT uint16_t
+#define BLE_CONNECTION_UNINITIALIZED ((uint16_t)0xFFFF)
+#define BLE_MAX_RECEIVE_WINDOW_SIZE 5
+
+#define BLE_CONFIG_ERROR_TYPE int32_t
+#define BLE_CONFIG_NO_ERROR 0
+#define BLE_CONFIG_ERROR_MIN 6000000
+#define BLE_CONFIG_ERROR_MAX 6000999
+#define _BLE_CONFIG_ERROR(e) (BLE_CONFIG_ERROR_MIN + (e))
+
+
+#endif // BLE_PROJECT_CONFIG_H

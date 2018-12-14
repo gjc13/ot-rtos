@@ -36,6 +36,8 @@
 #include <lwip/netif.h>
 #include <lwip/tcpip.h>
 #include <lwip/udp.h>
+
+#include <FreeRTOS.h>
 #include <semphr.h>
 
 #include <openthread/icmp6.h>
@@ -69,9 +71,10 @@ struct OutputEvent
     uint8_t      mData[1];
 };
 
-static SemaphoreHandle_t sGuardOutput = NULL;
-static OutputEvent *     sHeadOutput  = NULL;
-static OutputEvent *     sLastOutput  = NULL;
+static SemaphoreHandle_t sGuardOutput     = NULL;
+static OutputEvent *     sHeadOutput      = NULL;
+static OutputEvent *     sLastOutput      = NULL;
+static bool              sSecurityEnabled = false;
 static struct netif      sNetif;
 
 static bool IsLinkLocal(const struct otIp6Address &aAddress)
@@ -230,6 +233,12 @@ static void processStateChange(otChangedFlags aFlags, void *aContext)
         }
         UNLOCK_TCPIP_CORE();
     }
+
+    if (OT_CHANGED_THREAD_ROLE | aFlags)
+    {
+        // Openweave use unsecure link local transmission without Openthread enabled
+        sSecurityEnabled = (otThreadGetDeviceRole(instance) != OT_DEVICE_ROLE_DISABLED);
+    }
 }
 
 static void processAddress(const otIp6Address *aAddress, uint8_t aPrefixLength, bool aIsAdded, void *aContext)
@@ -299,15 +308,33 @@ exit:
 
 static void processTransmit(otInstance *aInstance)
 {
-    otError    error   = OT_ERROR_NONE;
-    otMessage *message = NULL;
+    otError           error   = OT_ERROR_NONE;
+    otMessage *       message = NULL;
+    otMessageSettings settings;
 
     VerifyOrExit(sHeadOutput != NULL);
 
-    message = otIp6NewMessage(aInstance, NULL);
+    settings.mLinkSecurityEnabled = sSecurityEnabled;
+    settings.mPriority            = OT_MESSAGE_PRIORITY_NORMAL;
+    message                       = otIp6NewMessage(aInstance, &settings);
     VerifyOrExit(message != NULL, error = OT_ERROR_NO_BUFS);
 
     SuccessOrExit(error = otMessageAppend(message, sHeadOutput->mData, sHeadOutput->mLength));
+
+    // handle openweave tcp unsecure port
+    // XXX: temporary solution, should add openthread api for opening unsecure socket
+    if (!sSecurityEnabled)
+    {
+        struct ip6_hdr *ip6Hdr     = reinterpret_cast<struct ip6_hdr *>(&sHeadOutput->mData);
+        uint16_t *      srcPortPtr = reinterpret_cast<uint16_t *>(&sHeadOutput->mData + sizeof(ip6_hdr));
+        uint16_t        srcPort;
+
+        if (IP6H_NEXTH((ip6Hdr)) == IP6_NEXTH_TCP)
+        {
+            srcPort = lwip_ntohs(*srcPortPtr);
+            SuccessOrExit(error = otIp6AddUnsecurePort(aInstance, srcPort));
+        }
+    }
 
     error   = otIp6Send(aInstance, message);
     message = NULL;

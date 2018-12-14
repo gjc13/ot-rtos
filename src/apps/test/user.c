@@ -34,6 +34,10 @@ static void ProcessTest(int argc, char *argv[])
     {
         xTaskCreate(mqttTask, "mqtt", 3000, NULL, 2, &gTestTask);
     }
+    else if (!strcmp(argv[0], "pair"))
+    {
+        xTaskCreate(weavePairTask, "pair", 4096, &gTestTask, 2, &gTestTask);
+    }
 }
 
 static void ProcessEchoServer(int argc, char *argv[])

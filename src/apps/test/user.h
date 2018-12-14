@@ -42,6 +42,7 @@ extern TaskHandle_t gTestTask;
 
 void httpTask(void *p);
 void mqttTask(void *p);
+void weavePairTask(void *p);
 
 bool startTcpEchoServer(otInstance *aInstance, uint16_t aPort);
 bool startTcpConnect(otInstance *aInstance, char * aPeer, uint16_t aPort);

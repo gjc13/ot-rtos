@@ -1,0 +1,15 @@
+#ifndef INETPROJECTCONFIG_H
+#define INETPROJECTCONFIG_H
+
+#define INET_CONFIG_ENABLE_RAW_ENDPOINT 0
+#define INET_CONFIG_ENABLE_UDP_ENDPOINT 1
+
+// ==================== Platform Adaptations ====================
+
+#define INET_CONFIG_ERROR_TYPE int32_t
+#define INET_CONFIG_NO_ERROR 0
+#define INET_CONFIG_ERROR_MIN 1000000
+#define INET_CONFIG_ERROR_MAX 1000999
+
+
+#endif // INETPROJECTCONFIG_H

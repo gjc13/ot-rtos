@@ -16,3 +16,6 @@
 [submodule "third_party/freertos-addons/repo"]
 	path = third_party/freertos-addons/repo
 	url = https://github.com/michaelbecker/freertos-addons.git
+[submodule "third_party/openweave-core/repo"]
+	path = third_party/openweave-core/repo
+	url = https://github.com/openweave/openweave-core.git
