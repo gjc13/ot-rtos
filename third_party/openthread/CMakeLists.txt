@@ -5,7 +5,7 @@ include(ExternalProject)
 ExternalProject_Add(ot
     SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/repo
     CONFIGURE_COMMAND cd ${CMAKE_CURRENT_SOURCE_DIR}/repo && ./bootstrap
-    BUILD_COMMAND sh -c "CPPFLAGS='-DMBEDTLS_BASE64_C -DMBEDTLS_OID_C -DMBEDTLS_PEM_PARSE_C -DMBEDTLS_X509_USE_C -DMBEDTLS_X509_CRT_PARSE_C -DNRF52840_XXAA' make -f ${CMAKE_CURRENT_SOURCE_DIR}/repo/examples/Makefile-nrf52840 JOINER=1 SNTP_CLIENT=1"
+    BUILD_COMMAND sh -c "CPPFLAGS='-DMBEDTLS_BASE64_C -DMBEDTLS_OID_C -DMBEDTLS_PEM_PARSE_C -DMBEDTLS_X509_USE_C -DMBEDTLS_X509_CRT_PARSE_C -DNRF52840_XXAA' make -f ${CMAKE_CURRENT_SOURCE_DIR}/repo/examples/Makefile-nrf52840 JOINER=1 SNTP_CLIENT=1 CERT_LOG=1"
     INSTALL_COMMAND cmake -E echo "Skipping install step."
     EXCLUDE_FROM_ALL TRUE)
 
@@ -19,8 +19,6 @@ set_property(TARGET openthread_diag PROPERTY IMPORTED_LOCATION ${BINARY_DIR}/out
 
 add_library(mbedcrypto STATIC IMPORTED)
 set_property(TARGET mbedcrypto PROPERTY IMPORTED_LOCATION ${BINARY_DIR}/output/nrf52840/lib/libmbedcrypto.a)
-#target_link_libraries(mbedcrypto INTERFACE
-#    openthread_nrf52840)
 
 add_library(openthread_platform_utils STATIC IMPORTED)
 set_property(TARGET openthread_platform_utils PROPERTY IMPORTED_LOCATION ${BINARY_DIR}/output/nrf52840/lib/libopenthread-platform-utils.a)

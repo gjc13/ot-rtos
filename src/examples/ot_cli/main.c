@@ -35,6 +35,18 @@
 #define STDOUT_FILENO 1
 #define STDERR_FILENO 2
 
+void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char *aFormat, ...)
+{
+    OT_UNUSED_VARIABLE(aLogLevel);
+    OT_UNUSED_VARIABLE(aLogRegion);
+    OT_UNUSED_VARIABLE(aFormat);
+
+    va_list ap;
+    va_start(ap, aFormat);
+    otCliPlatLogv(aLogLevel, aLogRegion, aFormat, ap);
+    va_end(ap);
+}
+
 int _write(int file, const char *p_char, int len)
 {
     int ret = len;
