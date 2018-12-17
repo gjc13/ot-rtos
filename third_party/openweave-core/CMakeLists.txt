@@ -90,6 +90,8 @@ set(OPENWEAVE_SRCS
     ${OPENWEAVE_SRC_DIR}/lib/profiles/device-control/DeviceControl.cpp
     ${OPENWEAVE_SRC_DIR}/lib/profiles/device-description/DeviceDescription.cpp
     ${OPENWEAVE_SRC_DIR}/lib/profiles/device-description/DeviceDescriptionServer.cpp
+    ${OPENWEAVE_SRC_DIR}/lib/profiles/network-provisioning/NetworkInfo.cpp
+    ${OPENWEAVE_SRC_DIR}/lib/profiles/network-provisioning/NetworkProvisioning.cpp
     ${OPENWEAVE_SRC_DIR}/lib/profiles/security/ApplicationKeysTrait.cpp
     ${OPENWEAVE_SRC_DIR}/lib/profiles/security/ApplicationKeysTraitDataSink.cpp
     ${OPENWEAVE_SRC_DIR}/lib/profiles/security/WeaveAccessToken.cpp
@@ -169,6 +171,7 @@ set(OPENWEAVE_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/thread_assist_pair.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/openweave_adaption/AESBlockCipher-MbedTLS.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/openweave_adaption/entropy.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/openweave_adaption/NetworkProvisionServer.cpp
     #${OPENWEAVE_SRC_DIR}/adaptations/device-layer/CASEAuth.cpp
     #${OPENWEAVE_SRC_DIR}/adaptations/device-layer/DeviceControlServer.cpp
     #${OPENWEAVE_SRC_DIR}/adaptations/device-layer/DeviceDescriptionServer.cpp

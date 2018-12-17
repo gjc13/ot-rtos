@@ -7,6 +7,7 @@
 #include "Weave/Core/WeaveGlobals.h"
 #include "Weave/Core/WeaveMessageLayer.h"
 #include "openweave_adaption/entropy.hpp"
+#include "openweave_adaption/NetworkProvisionServer.hpp"
 #include "test-apps/MockDDServer.h"
 
 using namespace nl::Weave;
@@ -22,6 +23,7 @@ void weavePairTask(void *p)
     TaskHandle_t *                              task = reinterpret_cast<TaskHandle_t *>(p);
     nl::Weave::OtFreeRTOS::ThreadAssistedPairer pairer(*task);
     MockDeviceDescriptionServer                 ddServer;
+    NetworkProvisioningFreeRTOSServer           npServer;
 
     printf("Start openweave init\n");
 
@@ -98,6 +100,14 @@ void weavePairTask(void *p)
     if (err != WEAVE_NO_ERROR)
     {
         printf("ddServer.Init failed: %s\n", nl::ErrorStr(err));
+        exit(EXIT_FAILURE);
+    }
+
+    printf("Init network provisioning server\n");
+    err = npServer.Init(&ExchangeMgr);
+    if (err != WEAVE_NO_ERROR)
+    {
+        printf("npServer.Init failed: %s\n", nl::ErrorStr(err));
         exit(EXIT_FAILURE);
     }
 

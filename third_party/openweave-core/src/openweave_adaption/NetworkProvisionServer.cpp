@@ -247,6 +247,8 @@ WEAVE_ERROR NetworkProvisioningFreeRTOSServer::HandleAddNetwork(PacketBuffer *ne
     NetworkInfo *targetNetworkConfig = NULL;
     TLVReader    reader;
 
+    printf("Hande Add network\n");
+
     reader.Init(networkInfoTLV);
 
     err = reader.Next();
@@ -430,6 +432,7 @@ WEAVE_ERROR NetworkProvisioningFreeRTOSServer::HandleEnableNetwork(uint32_t netw
     otError      otErr                 = OT_ERROR_NONE;
     NetworkInfo *existingNetworkConfig = NULL;
 
+    printf("Enable network called\n");
     for (int i = 0; i < kmMaxProvisionSize; i++)
     {
         if (mProvisionNetworks[i].NetworkType != kNetworkType_NotSpecified &&
@@ -447,44 +450,48 @@ WEAVE_ERROR NetworkProvisioningFreeRTOSServer::HandleEnableNetwork(uint32_t netw
         ExitNow();
     }
 
+    // only set name, extpanid and masterkey which is configured via add-thread-network
     do
     {
         otExtendedPanId extPanId;
         otMasterKey     key;
 
+        printf("Set name %s\n", existingNetworkConfig->ThreadNetworkName);
         OT_API_CALL(otErr = otThreadSetNetworkName(otxGetInstance(), existingNetworkConfig->ThreadNetworkName));
+        printf("1 err %d\n", otErr);
         if (otErr != OT_ERROR_NONE)
         {
             break;
         }
 
-        OT_API_CALL(otErr = otLinkSetPanId(otxGetInstance(), existingNetworkConfig->ThreadPANId));
-        if (otErr != OT_ERROR_NONE)
-        {
-            break;
+        printf("Set extpanid ");
+        for (int i = 0; i < sizeof(extPanId.m8); i++) {
+            printf("%02x", existingNetworkConfig->ThreadExtendedPANId[i]);
         }
-
+        printf("\n");
         memcpy(extPanId.m8, existingNetworkConfig->ThreadExtendedPANId, sizeof(extPanId.m8));
         OT_API_CALL(otErr = otThreadSetExtendedPanId(otxGetInstance(), &extPanId));
+        printf("3 err %d\n", otErr);
         if (otErr != OT_ERROR_NONE)
         {
             break;
         }
 
-        OT_API_CALL(otErr = otLinkSetChannel(otxGetInstance(), existingNetworkConfig->ThreadChannel));
-        if (otErr != OT_ERROR_NONE)
-        {
-            break;
+        printf("Set masterkey ");
+        for (int i = 0; i < sizeof(key.m8); i++) {
+            printf("%02x", existingNetworkConfig->ThreadNetworkKey[i]);
         }
-
+        printf("\n");
         memcpy(key.m8, existingNetworkConfig->ThreadNetworkKey, existingNetworkConfig->ThreadNetworkKeyLen);
         OT_API_CALL(otErr = otThreadSetMasterKey(otxGetInstance(), &key));
+        printf("5 err %d\n", otErr);
         if (otErr != OT_ERROR_NONE)
         {
             break;
         }
 
         OT_API_CALL(otErr = otThreadSetEnabled(otxGetInstance(), true));
+        printf("6 err %d\n", otErr);
     } while (0);
 
     if (otErr != OT_ERROR_NONE)

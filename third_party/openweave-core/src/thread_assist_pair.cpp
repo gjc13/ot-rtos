@@ -19,6 +19,7 @@ WEAVE_ERROR ThreadAssistedPairer::StartThreadAssistedPairing()
 {
     WEAVE_ERROR err = WEAVE_NO_ERROR;
 
+    printf("Start scan thread networks\n");
     SuccessOrExit(err = ScanThreadNetworks());
     
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
@@ -99,7 +100,7 @@ WEAVE_ERROR ThreadAssistedPairer::StartPair()
         }
 
         err = ConnectToWeave(&mScanResults[mNowConnectId]);
-        if (err != WEAVE_NO_ERROR)
+        if (err == WEAVE_NO_ERROR)
         {
             break;
         }
@@ -152,11 +153,6 @@ otError ThreadAssistedPairer::OpenUnsecurePort()
 
 WEAVE_ERROR ThreadAssistedPairer::ConnectToWeave(otActiveScanResult *aTarget)
 {
-    printf("Target ext addr:");
-    for (int i = 0; i < 8; i++) {
-        printf("%02x ", aTarget->mExtAddress.m8[i]);
-    }
-    printf("\n");
     otExtAddress extAddr = aTarget->mExtAddress;
     ip6_addr_t   peerBufAddr;
     IPAddress    peerAddr;
@@ -178,7 +174,12 @@ WEAVE_ERROR ThreadAssistedPairer::ConnectToWeave(otActiveScanResult *aTarget)
     addrPtr[1] = 0x80;
     memcpy(&addrPtr[8], extAddr.m8, sizeof(extAddr.m8));
     peerBufAddr.zone = IP6_NO_ZONE;
-    peerAddr.FromIPv6(peerBufAddr);
+    peerAddr = IPAddress::FromIPv6(peerBufAddr);
+
+    printf("%08x\n", peerAddr.Addr[0]);
+    char buf[100];
+    peerAddr.ToString(buf, 100);
+    printf("peer addr %s\n", buf);
 
     // connection callback
     mWeaveConnection                       = MessageLayer.NewConnection();
