@@ -6,8 +6,10 @@
 #include "thread_assist_pair.hpp"
 #include "Weave/Core/WeaveGlobals.h"
 #include "Weave/Core/WeaveMessageLayer.h"
-#include "openweave_adaption/entropy.hpp"
+#include "openweave_adaption/FabricProvisionServer.hpp"
+#include "openweave_adaption/GroupKeyMemoryStorage.hpp"
 #include "openweave_adaption/NetworkProvisionServer.hpp"
+#include "openweave_adaption/entropy.hpp"
 #include "test-apps/MockDDServer.h"
 
 using namespace nl::Weave;
@@ -16,14 +18,16 @@ using namespace nl::Weave::OtFreeRTOS;
 void weavePairTask(void *p)
 {
     WEAVE_ERROR                                 err;
+    TaskHandle_t *                              task = reinterpret_cast<TaskHandle_t *>(p);
     sys_mbox_t                                  system_mbox;
     nl::Weave::System::Layer                    SystemLayer;
     nl::Inet::InetLayer                         Inet;
     WeaveMessageLayer::InitContext              initContext;
-    TaskHandle_t *                              task = reinterpret_cast<TaskHandle_t *>(p);
     nl::Weave::OtFreeRTOS::ThreadAssistedPairer pairer(*task);
     MockDeviceDescriptionServer                 ddServer;
     NetworkProvisioningFreeRTOSServer           npServer;
+    FabricProvisioningFreeRTOSServer            fpServer;
+    GroupKeyMemoryStore                         keyStorage;
 
     printf("Start openweave init\n");
 
@@ -55,9 +59,10 @@ void weavePairTask(void *p)
     }
 
     printf("Init fabric state");
-    err                     = FabricState.Init();
-    FabricState.PairingCode = "UWR4K5";
+    err                  = FabricState.Init(&keyStorage);
+    FabricState.FabricId = 0;
     // XXX: for test only
+    FabricState.PairingCode = "UWR4K5";
     FabricState.LocalNodeId = 0x18B43000002DCF71ULL;
     if (err != WEAVE_NO_ERROR)
     {
@@ -108,6 +113,14 @@ void weavePairTask(void *p)
     if (err != WEAVE_NO_ERROR)
     {
         printf("npServer.Init failed: %s\n", nl::ErrorStr(err));
+        exit(EXIT_FAILURE);
+    }
+
+    printf("Init fabric provisioning server\n");
+    err = fpServer.Init(&ExchangeMgr);
+    if (err != WEAVE_NO_ERROR)
+    {
+        printf("fpServer.Init failed: %s\n", nl::ErrorStr(err));
         exit(EXIT_FAILURE);
     }
 

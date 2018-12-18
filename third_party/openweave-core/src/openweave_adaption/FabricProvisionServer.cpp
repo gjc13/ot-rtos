@@ -21,26 +21,35 @@ exit:
     return err;
 }
 
-WEAVE_ERROR FabricProvisioningFreeRTOSServer::HandleCreateFabric() {
+WEAVE_ERROR FabricProvisioningFreeRTOSServer::HandleCreateFabric()
+{
     printf("Weave fabric created (fabric id %llX)\n", (unsigned long long)FabricState->FabricId);
     return SendSuccessResponse();
 }
 
-WEAVE_ERROR FabricProvisioningFreeRTOSServer::HandleJoinExistingFabric() {
+WEAVE_ERROR FabricProvisioningFreeRTOSServer::HandleJoinExistingFabric()
+{
     printf("Joined existing Weave fabric (fabric id %llX)\n", (unsigned long long)FabricState->FabricId);
     return SendSuccessResponse();
 }
 
-WEAVE_ERROR FabricProvisioningFreeRTOSServer::HandleLeaveFabric() {
+WEAVE_ERROR FabricProvisioningFreeRTOSServer::HandleLeaveFabric()
+{
     printf("LeaveFabric complete\n");
     return SendSuccessResponse();
 }
 
-WEAVE_ERROR FabricProvisioningFreeRTOSServer::HandleGetFabricConfig() {
+WEAVE_ERROR FabricProvisioningFreeRTOSServer::HandleGetFabricConfig()
+{
     printf("GetFabricConfig complete\n");
     return WEAVE_NO_ERROR;
 }
 
+bool FabricProvisioningFreeRTOSServer::IsPairedToAccount() const
+{
+    return false;
 }
-}
-}
+
+} // namespace OtFreeRTOS
+} // namespace Weave
+} // namespace nl

@@ -14,7 +14,7 @@ public:
     WEAVE_ERROR HandleJoinExistingFabric(void) override;
     WEAVE_ERROR HandleLeaveFabric(void) override;
     WEAVE_ERROR HandleGetFabricConfig(void) override;
-private:
+    bool IsPairedToAccount() const override;
 };
 
 } // namespace OtFreeRTOS
