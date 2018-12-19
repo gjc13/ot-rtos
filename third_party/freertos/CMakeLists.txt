@@ -23,3 +23,10 @@ target_link_libraries(freertos
         openthread_nordicsemi
         freertos_portable
 )
+
+target_compile_options(freertos
+    PRIVATE
+       -Wall
+       -Wextra
+       -Wshadow
+       -Werror)

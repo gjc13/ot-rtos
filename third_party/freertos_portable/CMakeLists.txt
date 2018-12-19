@@ -13,3 +13,11 @@ target_link_libraries(freertos_portable
     PUBLIC
         freertos
 )
+
+target_compile_options(freertos_portable
+    PRIVATE
+       -Wall
+       -Wextra
+       -Wshadow
+       -Werror
+)

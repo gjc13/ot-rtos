@@ -101,3 +101,11 @@ target_link_libraries(lwip
         openthread
         platform
 )
+
+target_compile_options(lwip
+    PRIVATE
+        -Wall
+        -Wextra
+        -Wshadow
+        -Werror
+)

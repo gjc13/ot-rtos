@@ -2,9 +2,14 @@ cmake_minimum_required (VERSION 3.7)
 
 project(openthread_freertos)
 
-set(COMMON_FLAGS "-Os -g -fdata-sections -ffunction-sections  -Wall -Wextra -Wshadow -Werror -Wl,--gc-sections")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${COMMON_FLAGS}")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMMON_FLAGS} -std=gnu++98 -Wno-c++14-compat -fno-exceptions -fno-rtti")
+if (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Debug)
+endif()
+
+set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
+set(CMAKE_C_FLAGS_DEBUG "-g -O0")
+set(CMAKE_CXX_FLAGS_RELEASE "-Os")
+set(CMAKE_C_FLAGS_RELEASE "-Os")
 
 add_subdirectory(third_party/freertos)
 add_subdirectory(third_party/openthread)
@@ -42,6 +47,20 @@ target_link_libraries(frameworks INTERFACE
         jansson
         libjwt
         platform)
+
+target_compile_options(platform
+    PRIVATE
+       -Wall
+       -Wextra
+       -Wshadow
+       -Werror
+       $<$<COMPILE_LANGUAGE:CXX>:
+           -std=gnu++98
+           -Wno-c++14-compat
+           -fno-exceptions
+           -fno-rtti
+       >
+)
 
 add_subdirectory(src/apps/test)
 

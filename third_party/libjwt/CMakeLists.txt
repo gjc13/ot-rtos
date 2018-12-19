@@ -13,6 +13,10 @@ set(LIBJWT_SRC_FILES
 add_library(libjwt ${LIBJWT_SRC_FILES})
 
 target_compile_options(libjwt PRIVATE
+    -Wall
+    -Wextra
+    -Wshadow
+    -Werror
     -Wno-unused-parameter
     -Wno-pointer-sign
     -Wno-unused-variable

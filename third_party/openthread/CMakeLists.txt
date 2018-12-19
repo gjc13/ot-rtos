@@ -72,16 +72,16 @@ target_link_libraries(openthread INTERFACE
     openthread_nordicsemi
     nrf_cc310)
 
-target_compile_options(openthread INTERFACE
-    -DMBEDTLS_CONFIG_FILE=\"mbedtls-config.h\"
-    -DMBEDTLS_USER_CONFIG_FILE=\"nrf52840-mbedtls-config.h\"
-    -DOPENTHREAD_PROJECT_CORE_CONFIG_FILE=\"openthread-core-nrf52840-config.h\"
-    -DMBEDTLS_BASE64_C
-    -DMBEDTLS_OID_C
-    -DMBEDTLS_PEM_PARSE_C
-    -DMBEDTLS_X509_USE_C
-    -DMBEDTLS_X509_CRT_PARSE_C
-    -DNRF52840_XXAA)
+target_compile_definitions(openthread INTERFACE
+    MBEDTLS_CONFIG_FILE=\"mbedtls-config.h\"
+    MBEDTLS_USER_CONFIG_FILE=\"nrf52840-mbedtls-config.h\"
+    OPENTHREAD_PROJECT_CORE_CONFIG_FILE=\"openthread-core-nrf52840-config.h\"
+    MBEDTLS_BASE64_C
+    MBEDTLS_OID_C
+    MBEDTLS_PEM_PARSE_C
+    MBEDTLS_X509_USE_C
+    MBEDTLS_X509_CRT_PARSE_C
+    NRF52840_XXAA)
 
 target_include_directories(openthread INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}/repo/examples/platforms
