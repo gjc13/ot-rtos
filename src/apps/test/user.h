@@ -32,6 +32,8 @@
 #include <FreeRTOS.h>
 #include <task.h>
 
+#include <openthread/instance.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -40,6 +42,11 @@ extern TaskHandle_t gTestTask;
 
 void httpTask(void *p);
 void mqttTask(void *p);
+
+bool startTcpEchoServer(otInstance *aInstance, uint16_t aPort);
+bool startTcpConnect(otInstance *aInstance, char * aPeer, uint16_t aPort);
+bool startTcpDisconnect(void);
+bool startTcpSend(otInstance *aInstance, uint32_t count, uint32_t size);
 
 #ifdef __cplusplus
 }

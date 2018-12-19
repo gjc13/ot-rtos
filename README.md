@@ -112,3 +112,10 @@ A sample config is given below:
 `CLOUDIOT_CERT` is the first certificate from [https://pki.google.com/roots.pem](https://pki.google.com/roots.pem)
 
 You can use command `test mqtt` to test connect and publish a message to Google Cloud IoT core.
+
+### TCP echo server and client
+Commands:
+- `tcp_echo_server port` starts TCP echo server on given `port`.
+- `tcp_connect ipaddr port` connects to given TCP server.
+- `tcp_send size count` sends `count` packets with given `size` to connected TCP server. At the end it prints statistics.
+- `tcp_disconnect` disconnects from TCP server.

@@ -8,6 +8,13 @@
 
 TaskHandle_t gTestTask = NULL;
 
+static otError parseLong(char *argv, long *aValue)
+{
+    char *endptr;
+    *aValue = strtol(argv, &endptr, 0);
+    return (*endptr == '\0') ? OT_ERROR_NONE : OT_ERROR_PARSE;
+}
+
 static void ProcessTest(int argc, char *argv[])
 {
     if (argc < 1)
@@ -29,7 +36,104 @@ static void ProcessTest(int argc, char *argv[])
     }
 }
 
-static const struct otCliCommand sCommands[] = {{"test", ProcessTest}};
+static void ProcessEchoServer(int argc, char *argv[])
+{
+    int32_t port;
+
+    if (argc != 1)
+    {
+        otCliUartAppendResult(OT_ERROR_PARSE);
+        return;
+    }
+
+    if (parseLong(argv[0], &port) != OT_ERROR_NONE)
+    {
+        otCliUartAppendResult(OT_ERROR_PARSE);
+        return;
+    }
+
+    if (!startTcpEchoServer(otxGetInstance(), (uint16_t)port))
+    {
+        otCliUartAppendResult(OT_ERROR_BUSY);
+        return;
+    }
+}
+
+static void ProcessConnect(int argc, char *argv[])
+{
+    int32_t port;
+
+    if (argc != 2)
+    {
+        otCliUartAppendResult(OT_ERROR_PARSE);
+        return;
+    }
+
+    if (parseLong(argv[1], &port) != OT_ERROR_NONE)
+    {
+        otCliUartAppendResult(OT_ERROR_PARSE);
+        return;
+    }
+
+    if (!startTcpConnect(otxGetInstance(), argv[0], (uint16_t)port))
+    {
+        otCliUartAppendResult(OT_ERROR_BUSY);
+        return;
+    }
+}
+
+static void ProcessDisconnect(int argc, char *argv[])
+{
+    UNUSED_VARIABLE(argc);
+    UNUSED_VARIABLE(argv);
+
+    if (!startTcpDisconnect())
+    {
+        otCliUartAppendResult(OT_ERROR_BUSY);
+        return;
+    }
+}
+
+bool startTcpSend(otInstance *aInstance, uint32_t count, uint32_t size);
+
+static void ProcessSend(int argc, char *argv[])
+{
+    int32_t count;
+    int32_t size;
+
+    if (argc != 2)
+    {
+        otCliUartAppendResult(OT_ERROR_PARSE);
+        return;
+    }
+
+    if (parseLong(argv[1], &count) != OT_ERROR_NONE)
+    {
+        otCliUartAppendResult(OT_ERROR_PARSE);
+        return;
+    }
+
+    if (parseLong(argv[0], &size) != OT_ERROR_NONE)
+    {
+        otCliUartAppendResult(OT_ERROR_PARSE);
+        return;
+    }
+
+    if (!startTcpSend(otxGetInstance(), (uint16_t)count, (uint16_t)size))
+    {
+        otCliUartAppendResult(OT_ERROR_BUSY);
+        return;
+    }
+}
+
+static const struct otCliCommand sCommands[] = {
+    {"test", ProcessTest},
+    {"tcp_echo_server", ProcessEchoServer},
+    {"tcp_connect", ProcessConnect},
+    {"tcp_disconnect", ProcessDisconnect},
+    {"tcp_send", ProcessSend}
+};
+
 
 void otxUserInit(void)
 {

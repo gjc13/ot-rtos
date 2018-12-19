@@ -94,6 +94,10 @@ target_include_directories(lwip
         ${LWIP_DIR}/src/apps/altcp_tls
 )
 
+target_compile_definitions(lwip
+    PUBLIC
+        DEFAULT_ACCEPTMBOX_SIZE=10)
+
 target_link_libraries(lwip
     PUBLIC
         freertos
