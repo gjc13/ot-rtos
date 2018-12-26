@@ -50,10 +50,22 @@ if (${PLATFORM_NAME} STREQUAL nrf52)
     )
 endif()
 
+set(OT_EXTERNAL_DEFINITIONS OPENTHREAD_CONFIG_MAX_STATECHANGE_HANDLERS=4)
+
+if (${PLATFORM_NAME} STREQUAL linux_radio)
+    set(OT_EXTERNAL_DEFINITIONS 
+            ${OT_EXTERNAL_DEFINITIONS}
+            OPENTHREAD_CONFIG_POSIX_APP_ENABLE_PTY_DEVICE=0
+    )
+endif()
+
+string(REGEX REPLACE ";" " -D" OT_CPPFLAGS "${OT_EXTERNAL_DEFINITIONS}")
+set(OT_CPPFLAGS "-D${OT_CPPFLAGS}")
+
 ExternalProject_Add(ot_config
     SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/repo
     CONFIGURE_COMMAND cd ${CMAKE_CURRENT_SOURCE_DIR}/repo && ./bootstrap
-    BUILD_COMMAND sh -c "CPPFLAGS='-DOPENTHREAD_CONFIG_MAX_STATECHANGE_HANDLERS=4' make -f ${OT_MAKEFILE} JOINER=1 SNTP_CLIENT=1 FULL_LOGS=1 NO_BUILTIN_MBEDTLS=1 configure"
+    BUILD_COMMAND sh -c "CPPFLAGS='${OT_CPPFLAGS}' make -f ${OT_MAKEFILE} JOINER=1 SNTP_CLIENT=1 FULL_LOGS=1 DISABLE_BUILTIN_MBEDTLS=1 configure"
     INSTALL_COMMAND cmake -E echo "Skipping install step."
     EXCLUDE_FROM_ALL FALSE
 )
@@ -75,7 +87,7 @@ target_include_directories(openthread_config
 target_compile_definitions(openthread_config
     INTERFACE
         OPENTHREAD_PROJECT_CORE_CONFIG_FILE=\"openthread-core-${OT_PLATFORM_NAME}-config.h\"
-        OPENTHREAD_CONFIG_MAX_STATECHANGE_HANDLERS=4
+        ${OT_EXTERNAL_DEFINITIONS}
 )
 
 if (${PLATFORM_NAME} STREQUAL nrf52)
@@ -104,7 +116,7 @@ endif()
 ExternalProject_Add(ot
     SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/repo
     CONFIGURE_COMMAND cd ${CMAKE_CURRENT_SOURCE_DIR}/repo && ./bootstrap
-    BUILD_COMMAND sh -c "RAW_CPPFLAGS='-DOPENTHREAD_CONFIG_MAX_STATECHANGE_HANDLERS=4 -I$<JOIN:$<TARGET_PROPERTY:mbedcrypto,INTERFACE_INCLUDE_DIRECTORIES>, -I> -D$<JOIN:$<TARGET_PROPERTY:mbedcrypto,INTERFACE_COMPILE_DEFINITIONS>, -D>' CPPFLAGS=$\{RAW_CPPFLAGS//\\\"/\\\\\\\\\\\\\\\"} make -f ${OT_MAKEFILE} JOINER=1 SNTP_CLIENT=1 FULL_LOGS=1 NO_BUILTIN_MBEDTLS=1 DISABLE_EXECUTABLE=1"
+    BUILD_COMMAND sh -c "RAW_CPPFLAGS='${OT_CPPFLAGS} -I$<JOIN:$<TARGET_PROPERTY:mbedcrypto,INTERFACE_INCLUDE_DIRECTORIES>, -I> -D$<JOIN:$<TARGET_PROPERTY:mbedcrypto,INTERFACE_COMPILE_DEFINITIONS>, -D>' CPPFLAGS=$\{RAW_CPPFLAGS//\\\"/\\\\\\\\\\\\\\\"} make -f ${OT_MAKEFILE} JOINER=1 SNTP_CLIENT=1 FULL_LOGS=1 DISABLE_BUILTIN_MBEDTLS=1 DISABLE_EXECUTABLE=1"
     INSTALL_COMMAND cmake -E echo "Skipping install step."
     EXCLUDE_FROM_ALL TRUE
 )
@@ -167,9 +179,15 @@ target_link_libraries(openthread
         openthread_cli_ftd
         openthread_diag
         openthread_ftd
-        openthread_platform_utils
         ot_platform_${PLATFORM_NAME}
 )
+
+if (NOT ${PLATFORM_NAME} STREQUAL linux_radio)
+    target_link_libraries(openthread
+        INTERFACE
+            openthread_platform_utils
+    )
+endif()
 
 if (${PLATFORM_NAME} STREQUAL nrf52)
     target_link_libraries(openthread

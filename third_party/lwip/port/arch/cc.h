@@ -57,7 +57,7 @@
         fflush(NULL);                                                                         \
     } while (0)
 
-#ifdef PLATFORM_linux
+#if PLATFORM_linux || PLATFORM_linux_radio
 #define LWIP_ERRNO_STDINCLUDE 1
 #undef LWIP_PROVIDE_ERRNO
 #else

@@ -68,7 +68,7 @@ int _write(int file, const char *p_char, int len)
     return ret;
 }
 
-#ifdef PLATFORM_linux
+#if PLATFORM_linux || PLATFORM_linux_radio
 #include <setjmp.h>
 #include <stdio.h>
 #include <unistd.h>

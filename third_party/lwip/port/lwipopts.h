@@ -453,8 +453,7 @@
 
 #define LWIP_DEBUG 1
 
-#ifdef PLATFORM_linux
-#define LWIP_PROVIDE_ERRNO              0
+#if PLATFORM_linux || PLATFORM_linux_radio
 #define LWIP_ERRNO_STDINCLUDE           1
 #define IPV6_FRAG_COPYHEADER            1
 #endif

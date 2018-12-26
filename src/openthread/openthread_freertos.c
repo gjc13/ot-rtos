@@ -47,6 +47,13 @@
 #include "apps/misc/nat64_utils.h"
 #include "portable/portable.h"
 
+#if PLATFORM_linux_radio
+static bool otSysPseudoResetWasRequested(void)
+{
+    return false;
+}
+#endif
+
 static TaskHandle_t      sMainTask     = NULL;
 static SemaphoreHandle_t sExternalLock = NULL;
 static otInstance *      sInstance     = NULL;
@@ -70,7 +77,7 @@ static void mainloop(void *aContext)
         otTaskletsProcess(instance);
         otSysProcessDrivers(instance);
         netifProcess(instance);
-#if PLATFORM_linux // linux use select rather than event notification
+#if PLATFORM_linux || PLATFORM_linux_radio // linux use select rather than event notification
         xSemaphoreGive(sExternalLock);
         portYIELD();
         xSemaphoreTake(sExternalLock, portMAX_DELAY);
@@ -87,14 +94,14 @@ static void mainloop(void *aContext)
 
 void otxTaskNotifyGive()
 {
-#if !PLATFORM_linux // linux use select rather than event notification
+#if !PLATFORM_linux && !PLATFORM_linux_radio // linux use select rather than event notification
     xTaskNotifyGive(sMainTask);
 #endif
 }
 
 void otxTaskNotifyGiveFromISR()
 {
-#if !PLATFORM_linux // linux use select rather than event notification
+#if !PLATFORM_linux && !PLATFORM_linux_radio // linux use select rather than event notification
     BaseType_t taskWoken;
 
     vTaskNotifyGiveFromISR(sMainTask, &taskWoken);
@@ -116,10 +123,14 @@ void otTaskletsSignalPending(otInstance *aInstance)
 
 void otxInit(int argc, char *argv[])
 {
+#if PLATFORM_linux_radio
+    sInstance = otSysInit(argc, argv);
+#else
     otSysInit(argc, argv);
 
     sInstance = otInstanceInitSingle();
     assert(sInstance);
+#endif
 
 #if OPENTHREAD_ENABLE_DIAG
     otDiagInit(sInstance);
