@@ -11,79 +11,95 @@ set(CMAKE_C_FLAGS_DEBUG "-g -O0")
 set(CMAKE_CXX_FLAGS_RELEASE "-Os")
 set(CMAKE_C_FLAGS_RELEASE "-Os")
 
+set(FIRST_PARTY_COMPILE_FLAGS 
+   -Wall
+   -Wextra
+   -Wshadow
+   -Werror
+   $<$<COMPILE_LANGUAGE:CXX>:
+       -std=gnu++98
+       -Wno-c++14-compat
+       -fno-exceptions
+       -fno-rtti
+   >
+)
+
 add_subdirectory(third_party/freertos)
+add_subdirectory(third_party/freertos_portable)
+add_subdirectory(third_party/freertos-addons)
 add_subdirectory(third_party/openthread)
 add_subdirectory(third_party/jansson)
 add_subdirectory(third_party/libjwt)
 add_subdirectory(third_party/lwip)
-add_subdirectory(third_party/freertos_portable)
+add_subdirectory(third_party/mbedtls)
+
+add_subdirectory(src/apps/test)
 
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-set(FRAMEWORKS_SRCS
-    ${SRC_DIR}/apps/misc/nat64_utils.c
-    ${SRC_DIR}/apps/misc/time_ntp.cpp
+add_library(common_utils
     ${SRC_DIR}/common/entropy_utils.c
-    ${SRC_DIR}/openthread/netif.cpp
-    ${SRC_DIR}/openthread/openthread_freertos.c
 )
 
-add_library(platform ${FRAMEWORKS_SRCS})
-
-target_include_directories(platform
+target_include_directories(common_utils
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-target_link_libraries(platform
+target_link_libraries(common_utils
     PUBLIC
+        mbedcrypto
+)
+
+target_compile_options(common_utils
+    PRIVATE
+        ${FIRST_PARTY_COMPILE_FLAGS}
+)
+
+add_library(frameworks
+    ${SRC_DIR}/apps/misc/nat64_utils.c
+    ${SRC_DIR}/apps/misc/time_ntp.cpp
+    ${SRC_DIR}/openthread/netif.cpp
+    ${SRC_DIR}/openthread/openthread_freertos.c
+)
+
+target_link_libraries(frameworks
+    PUBLIC
+        common_utils
+        freertos
+        jansson
+        libjwt
         lwip
-        freertos_portable
         openthread
 )
 
-add_library(frameworks INTERFACE)
-target_link_libraries(frameworks INTERFACE
-        jansson
-        libjwt
-        platform)
-
-target_compile_options(platform
+target_compile_options(frameworks
     PRIVATE
-       -Wall
-       -Wextra
-       -Wshadow
-       -Werror
-       $<$<COMPILE_LANGUAGE:CXX>:
-           -std=gnu++98
-           -Wno-c++14-compat
-           -fno-exceptions
-           -fno-rtti
-       >
+        ${FIRST_PARTY_COMPILE_FLAGS}
 )
 
-add_subdirectory(src/apps/test)
+add_executable(ot_cli_${PLATFORM_NAME} ${SRC_DIR}/examples/ot_cli/main.c)
 
-add_executable(ot_cli_nrf52840 ${SRC_DIR}/examples/ot_cli/main.c)
-
-target_link_libraries(ot_cli_nrf52840
+target_link_libraries(ot_cli_${PLATFORM_NAME}
     PUBLIC
         test_app
 )
 
-target_compile_definitions(ot_cli_nrf52840
-    PUBLIC
-        __HEAP_SIZE=8192
-        __STACK_SIZE=8192
-)
+if (${PLATFORM_NAME} STREQUAL nrf52)
+    target_compile_definitions(ot_cli_${PLATFORM_NAME}
+        PUBLIC
+            __HEAP_SIZE=8192
+            __STACK_SIZE=8192
+    )
 
-#special link script
-set_target_properties(ot_cli_nrf52840 PROPERTIES LINK_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/third_party/openthread/repo/examples/platforms/nrf52840/nrf52840.ld)
-set_target_properties(ot_cli_nrf52840 PROPERTIES LINK_FLAGS "-L ${CMAKE_CURRENT_SOURCE_DIR}/third_party/nRF5_SDK/repo/modules/nrfx/mdk/ -T ${CMAKE_CURRENT_SOURCE_DIR}/third_party/openthread/repo/examples/platforms/nrf52840/nrf52840.ld -lc -lnosys -lm -lstdc++")
+    #special link script
+    set_target_properties(ot_cli_${PLATFORM_NAME} PROPERTIES LINK_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/third_party/openthread/repo/examples/platforms/nrf52840/nrf52840.ld)
+    set_target_properties(ot_cli_${PLATFORM_NAME} PROPERTIES LINK_FLAGS "-T ${CMAKE_CURRENT_SOURCE_DIR}/third_party/openthread/repo/examples/platforms/nrf52840/nrf52840.ld -lc -lnosys -lm -lstdc++")
 
-#build hex file
-add_custom_command(OUTPUT ot_cli_nrf52840.hex
-    COMMAND arm-none-eabi-objcopy -O ihex ot_cli_nrf52840 ot_cli_nrf52840.hex
-    DEPENDS ot_cli_nrf52840
-)
-add_custom_target(ot_cli_nrf52840_hex ALL DEPENDS ot_cli_nrf52840.hex)
+    #build hex file
+    add_custom_command(OUTPUT ot_cli_${PLATFORM_NAME}.hex
+        COMMAND arm-none-eabi-objcopy -O ihex ot_cli_${PLATFORM_NAME} ot_cli_${PLATFORM_NAME}.hex
+        DEPENDS ot_cli_${PLATFORM_NAME}
+    )
+    add_custom_target(ot_cli_nrf52_hex ALL DEPENDS ot_cli_${PLATFORM_NAME}.hex)
+endif()

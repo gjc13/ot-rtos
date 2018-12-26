@@ -293,10 +293,10 @@ void sendTask(void *p)
 
     throughput = (100 * 8 * send_params->mSize * send_params->mCount) / msec;
 
-    printf("tcp_client: Data transmitted : %lu B\r\n", send_params->mSize * send_params->mCount);
-    printf("tcp_client: Time             : %lu ms\r\n", msec);
-    printf("tcp_client: Throughput       : %lu.%02lu Kb/s\r\n", throughput / 100, throughput % 100);
-    printf("tcp_client: Latency          : Avg: %lu ms Min: %lu ms, Max: %lu ms\r\n",
+    printf("tcp_client: Data transmitted : %" PRIu32 " B\r\n", send_params->mSize * send_params->mCount);
+    printf("tcp_client: Time             : %" PRIu32 " ms\r\n", msec);
+    printf("tcp_client: Throughput       : %" PRIu32 ".%"PRIu32" Kb/s\r\n", throughput / 100, throughput % 100);
+    printf("tcp_client: Latency          : Avg: %" PRIu32 " ms Min: %" PRIu32 " ms, Max: %" PRIu32 " ms\r\n",
            (uint32_t)lat_sum / send_params->mCount,
            lat_min,
            lat_max);

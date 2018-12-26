@@ -27,7 +27,6 @@
  */
 
 #include <openthread-core-config.h>
-
 #include <openthread/openthread-freertos.h>
 
 #include <assert.h>
@@ -40,12 +39,13 @@
 #include <lwip/tcpip.h>
 
 #include <openthread/diag.h>
+#include <openthread/cli.h>
 #include <openthread/tasklet.h>
-
-#include "openthread-system.h"
+#include <openthread-system.h>
 
 #include "netif.h"
 #include "apps/misc/nat64_utils.h"
+#include "portable/portable.h"
 
 static TaskHandle_t      sMainTask     = NULL;
 static SemaphoreHandle_t sExternalLock = NULL;
@@ -64,14 +64,21 @@ static void mainloop(void *aContext)
 {
     otInstance *instance = (otInstance *)aContext;
 
+    xSemaphoreTake(sExternalLock, portMAX_DELAY);
     while (!otSysPseudoResetWasRequested())
     {
         otTaskletsProcess(instance);
         otSysProcessDrivers(instance);
         netifProcess(instance);
+#if PLATFORM_linux // linux use select rather than event notification
+        xSemaphoreGive(sExternalLock);
+        portYIELD();
+        xSemaphoreTake(sExternalLock, portMAX_DELAY);
+#else
         xSemaphoreGive(sExternalLock);
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
         xSemaphoreTake(sExternalLock, portMAX_DELAY);
+#endif
     }
 
     otInstanceFinalize(sInstance);
@@ -80,19 +87,23 @@ static void mainloop(void *aContext)
 
 void otxTaskNotifyGive()
 {
+#if !PLATFORM_linux // linux use select rather than event notification
     xTaskNotifyGive(sMainTask);
+#endif
 }
 
 void otxTaskNotifyGiveFromISR()
 {
+#if !PLATFORM_linux // linux use select rather than event notification
     BaseType_t taskWoken;
 
     vTaskNotifyGiveFromISR(sMainTask, &taskWoken);
 
     if (taskWoken)
     {
-        portYIELD_FROM_ISR(taskWoken);
+        portEND_SWITCHING_ISR(taskWoken);
     }
+#endif
 }
 
 void otTaskletsSignalPending(otInstance *aInstance)
@@ -124,7 +135,7 @@ void otxStart(void)
 {
     xTaskCreate(mainloop, "ot", 4096, sInstance, 2, &sMainTask);
     // Activate deep sleep mode
-    SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
+    PORT_ENABLE_SLEEP();
     vTaskStartScheduler();
 }
 

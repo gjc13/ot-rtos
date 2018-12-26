@@ -26,7 +26,9 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <openthread-core-config.h>
 #include <openthread/openthread-freertos.h>
+#include <openthread-system.h>
 
 #include <errno.h>
 #include <openthread/cli.h>
@@ -35,6 +37,7 @@
 #define STDOUT_FILENO 1
 #define STDERR_FILENO 2
 
+#if OPENTHREAD_CONFIG_LOG_OUTPUT == OPENTHREAD_CONFIG_LOG_OUTPUT_APP
 void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char *aFormat, ...)
 {
     OT_UNUSED_VARIABLE(aLogLevel);
@@ -46,6 +49,7 @@ void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char *aFormat
     otCliPlatLogv(aLogLevel, aLogRegion, aFormat, ap);
     va_end(ap);
 }
+#endif
 
 int _write(int file, const char *p_char, int len)
 {
@@ -64,8 +68,36 @@ int _write(int file, const char *p_char, int len)
     return ret;
 }
 
+#ifdef PLATFORM_linux
+#include <setjmp.h>
+#include <stdio.h>
+#include <unistd.h>
+
+jmp_buf gResetJump;
+
+void vApplicationMallocFailedHook(void)
+{
+    printf("failed malloc\n");
+    exit(-1);
+}
+
+void vAssertCalled(unsigned long ulLine, const char *const pcFileName)
+{
+    UNUSED_VARIABLE(pcFileName);
+    UNUSED_VARIABLE(ulLine);
+}
+
+#endif
+
 int main(int argc, char *argv[])
 {
+#if PLATFORM_linux
+    if (setjmp(gResetJump))
+    {
+        alarm(0);
+        execvp(argv[0], argv);
+    }
+#endif
     otxInit(argc, argv);
     otCliUartInit(otxGetInstance());
     otxUserInit();

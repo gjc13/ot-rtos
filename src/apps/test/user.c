@@ -38,7 +38,7 @@ static void ProcessTest(int argc, char *argv[])
 
 static void ProcessEchoServer(int argc, char *argv[])
 {
-    int32_t port;
+    long port;
 
     if (argc != 1)
     {
@@ -61,7 +61,7 @@ static void ProcessEchoServer(int argc, char *argv[])
 
 static void ProcessConnect(int argc, char *argv[])
 {
-    int32_t port;
+    long port;
 
     if (argc != 2)
     {
@@ -98,8 +98,8 @@ bool startTcpSend(otInstance *aInstance, uint32_t count, uint32_t size);
 
 static void ProcessSend(int argc, char *argv[])
 {
-    int32_t count;
-    int32_t size;
+    long count;
+    long size;
 
     if (argc != 2)
     {

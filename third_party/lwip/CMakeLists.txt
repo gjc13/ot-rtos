@@ -1,5 +1,4 @@
 cmake_minimum_required (VERSION 3.7)
-
 project(lwip)
 
 set(LWIP_DIR ${CMAKE_CURRENT_SOURCE_DIR}/repo)
@@ -101,9 +100,12 @@ target_compile_definitions(lwip
 target_link_libraries(lwip
     PUBLIC
         freertos
+        platform_${PLATFORM_NAME}
     PRIVATE
-        openthread
-        platform
+        common_utils
+        mbedcrypto
+        mbedtls
+        mbedx509
 )
 
 target_compile_options(lwip
@@ -113,3 +115,5 @@ target_compile_options(lwip
         -Wshadow
         -Werror
 )
+
+set_property(TARGET lwip PROPERTY C_STANDARD 99)

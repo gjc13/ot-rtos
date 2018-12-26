@@ -42,6 +42,8 @@
 #include <lwip/stats.h>
 #include <lwip/sys.h>
 
+#include <stdbool.h>
+
 static sys_mutex_t g_lwip_protect_mutex = NULL;
 
 #if !LWIP_COMPAT_MUTEX
@@ -192,6 +194,28 @@ err_t sys_mbox_trypost(sys_mbox_t *mbox, void *msg)
     else
     {
         err = ERR_MEM;
+    }
+
+    return err;
+}
+
+err_t sys_mbox_trypost_fromisr(sys_mbox_t *mbox, void *msg)
+{
+    err_t      err;
+    BaseType_t xHigherPriorityTaskWoken;
+
+    if (xQueueSendFromISR((*mbox)->os_mbox, &msg, &xHigherPriorityTaskWoken) == pdPASS)
+    {
+        err = ERR_OK;
+    }
+    else
+    {
+        err = ERR_MEM;
+    }
+
+    if (xHigherPriorityTaskWoken)
+    {
+        portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
     }
 
     return err;

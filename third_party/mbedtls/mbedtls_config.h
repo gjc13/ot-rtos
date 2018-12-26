@@ -26,44 +26,26 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LWIP_PORT_CC_H_
-#define LWIP_PORT_CC_H_
+#ifndef OT_FREERTOS_MBEDTLS_CONFIG_H
+#define OT_FREERTOS_MBEDTLS_CONFIG_H
 
-#define LWIP_TIMEVAL_PRIVATE 0
+#include "mbedtls-config.h"
 
-#define PACK_STRUCT_FIELD(x) x
-#define PACK_STRUCT_STRUCT __attribute__((packed))
-#define PACK_STRUCT_BEGIN
-#define PACK_STRUCT_END
-
-#ifndef BYTE_ORDER
-#define BYTE_ORDER LITTLE_ENDIAN
+#if ENABLE_ECDHE_RSA
+#define MBEDTLS_KEY_EXCHANGE_ECDHE_RSA_ENABLED
+#define MBEDTLS_ECDH_C
+#define MBEDTLS_DHM_C
+#define MBEDTLS_GCM_C
+#define MBEDTLS_SHA1_C
+#define MBEDTLS_RSA_C
+#define MBEDTLS_PKCS1_V15
+#define MBEDTLS_PKCS1_V21
+#define MBEDTLS_X509_CRT_PARSE_C
+#define MBEDTLS_X509_USE_C
+#define MBEDTLS_OID_C
+#define MBEDTLS_PK_WRITE_C
 #endif
 
-#include <stdio.h>
-#include <stdlib.h>
+#include "mbedtls/check_config.h"
 
-/* Plaform specific diagnostic output */
-#define LWIP_PLATFORM_DIAG(x) \
-    do                        \
-    {                         \
-        printf x;             \
-    } while (0)
-
-#define LWIP_PLATFORM_ASSERT(x)                                                               \
-    do                                                                                        \
-    {                                                                                         \
-        fprintf(stderr, "Assertion \"%s\" failed at line %d in %s\n", x, __LINE__, __FILE__); \
-        fflush(NULL);                                                                         \
-    } while (0)
-
-#ifdef PLATFORM_linux
-#define LWIP_ERRNO_STDINCLUDE 1
-#undef LWIP_PROVIDE_ERRNO
-#else
-#define LWIP_PROVIDE_ERRNO
-#endif
-
-#define LWIP_RAND() ((u32_t)rand())
-
-#endif // LWIP_PORT_CC_H_
+#endif /* MBEDTLS_CONFIG_H */

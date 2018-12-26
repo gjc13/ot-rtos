@@ -32,6 +32,8 @@ target_include_directories(libjwt
 
 target_link_libraries(libjwt
     PRIVATE
+        common_utils
         jansson
-        platform
+        mbedtls
+        platform_${PLATFORM_NAME}
 )

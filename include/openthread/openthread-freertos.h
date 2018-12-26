@@ -39,6 +39,8 @@
 #include <portmacro.h>
 #include <openthread/instance.h>
 
+#include "portable/portable.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -101,7 +103,7 @@ portFORCE_INLINE static BaseType_t otxPortIsInsideInterrupt(void)
     BaseType_t xReturn;
 
     /* Obtain the number of the currently executing interrupt. */
-    __asm volatile("mrs %0, ipsr" : "=r"(ulCurrentInterrupt)::"memory");
+    PORT_GET_IN_ISR(ulCurrentInterrupt);
 
     if (ulCurrentInterrupt == 0)
     {

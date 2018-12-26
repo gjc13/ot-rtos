@@ -2,91 +2,172 @@ cmake_minimum_required (VERSION 3.7)
 
 include(ExternalProject)
 
+if (${PLATFORM_NAME} STREQUAL nrf52)
+    set(OT_PLATFORM_NAME nrf52840)
+    set(OT_BUILD_DIR nrf52840)
+elseif(${PLATFORM_NAME} STREQUAL linux)
+    set(OT_PLATFORM_NAME posix)
+    set(OT_BUILD_DIR x86_64-unknown-linux-gnu)
+else()
+    set(OT_PLATFORM_NAME ${PLATFORM_NAME})
+endif()
+
+message("PLATFORM_NAME is ${PLATFORM_NAME}")
+message("OT_PLATFORM_NAME is ${OT_PLATFORM_NAME}")
+
+set(PLATFORM_CONFIG_INCLUDE_DIRECTORIES 
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/examples/platforms/${OT_PLATFORM_NAME}
+)
+
+if (${PLATFORM_NAME} STREQUAL nrf52)
+    set(PLATFORM_CONFIG_INCLUDE_DIRECTORIES
+        ${PLATFORM_CONFIG_INCLUDE_DIRECTORIES}
+        ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/dependencies
+        ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/drivers/clock
+        ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/libraries/app_error
+        ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/libraries/crypto
+        ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/libraries/nrf_cc310/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/nrfx
+        ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/nrfx/drivers/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/nrfx/hal
+        ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/nrfx/mdk
+        ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/cmsis
+    )
+endif()
+
+ExternalProject_Add(ot_config
+    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/repo
+    CONFIGURE_COMMAND cd ${CMAKE_CURRENT_SOURCE_DIR}/repo && ./bootstrap
+    BUILD_COMMAND sh -c "CPPFLAGS='-DOPENTHREAD_CONFIG_MAX_STATECHANGE_HANDLERS=4' make -f ${CMAKE_CURRENT_SOURCE_DIR}/repo/examples/Makefile-${OT_PLATFORM_NAME} JOINER=1 SNTP_CLIENT=1 FULL_LOGS=1 NO_BUILTIN_MBEDTLS=1 configure"
+    INSTALL_COMMAND cmake -E echo "Skipping install step."
+    EXCLUDE_FROM_ALL FALSE
+)
+
+ExternalProject_Get_Property(ot_config BINARY_DIR)
+
+add_library(openthread_config INTERFACE)
+
+target_include_directories(openthread_config 
+    INTERFACE
+        ${BINARY_DIR}/build/${OT_BUILD_DIR}/include
+        ${BINARY_DIR}/output/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core
+        ${CMAKE_CURRENT_SOURCE_DIR}/repo/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/mbedtls/
+        ${PLATFORM_CONFIG_INCLUDE_DIRECTORIES}
+)
+
+target_compile_definitions(openthread_config
+    INTERFACE
+        OPENTHREAD_PROJECT_CORE_CONFIG_FILE=\"openthread-core-${OT_PLATFORM_NAME}-config.h\"
+        OPENTHREAD_CONFIG_MAX_STATECHANGE_HANDLERS=4
+)
+
+if (${PLATFORM_NAME} STREQUAL nrf52)
+    target_compile_definitions(openthread_config
+        INTERFACE
+            NRF52840_XXAA
+    )
+endif()
+
+add_dependencies(openthread_config ot_config)
+
+add_library(mbedtls_platform_config INTERFACE)
+
+if (${PLATFORM_NAME} STREQUAL nrf52)
+    target_include_directories(mbedtls_platform_config
+        INTERFACE
+            ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/libraries/crypto/
+    )
+
+    target_compile_definitions(mbedtls_platform_config
+        INTERFACE
+            MBEDTLS_USER_CONFIG_FILE=\"nrf52840-mbedtls-config.h\"
+    )
+endif()
+
 ExternalProject_Add(ot
     SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/repo
     CONFIGURE_COMMAND cd ${CMAKE_CURRENT_SOURCE_DIR}/repo && ./bootstrap
-    BUILD_COMMAND sh -c "CPPFLAGS='-DMBEDTLS_BASE64_C -DMBEDTLS_OID_C -DMBEDTLS_PEM_PARSE_C -DMBEDTLS_X509_USE_C -DMBEDTLS_X509_CRT_PARSE_C -DNRF52840_XXAA' make -f ${CMAKE_CURRENT_SOURCE_DIR}/repo/examples/Makefile-nrf52840 JOINER=1 SNTP_CLIENT=1 CERT_LOG=1"
+    BUILD_COMMAND sh -c "RAW_CPPFLAGS='-DOPENTHREAD_CONFIG_MAX_STATECHANGE_HANDLERS=4 -I$<JOIN:$<TARGET_PROPERTY:mbedcrypto,INTERFACE_INCLUDE_DIRECTORIES>, -I> -D$<JOIN:$<TARGET_PROPERTY:mbedcrypto,INTERFACE_COMPILE_DEFINITIONS>, -D>' CPPFLAGS=$\{RAW_CPPFLAGS//\\\"/\\\\\\\\\\\\\\\"} make -f ${CMAKE_CURRENT_SOURCE_DIR}/repo/examples/Makefile-${OT_PLATFORM_NAME} JOINER=1 SNTP_CLIENT=1 FULL_LOGS=1 NO_BUILTIN_MBEDTLS=1 DISABLE_EXECUTABLE=1"
     INSTALL_COMMAND cmake -E echo "Skipping install step."
-    EXCLUDE_FROM_ALL TRUE)
+    EXCLUDE_FROM_ALL TRUE
+)
 
 ExternalProject_Get_Property(ot BINARY_DIR)
 
-add_library(nrf_cc310 STATIC IMPORTED)
-set_property(TARGET nrf_cc310 PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/libraries/nrf_cc310/lib/libnrf_cc310_0.9.10.a)
+if (${PLATFORM_NAME} STREQUAL nrf52)
+    add_library(nrf_cc310 STATIC IMPORTED)
+    set_property(TARGET nrf_cc310 PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/libraries/nrf_cc310/lib/libnrf_cc310_0.9.10.a)
+endif()
 
 add_library(openthread_diag STATIC IMPORTED)
-set_property(TARGET openthread_diag PROPERTY IMPORTED_LOCATION ${BINARY_DIR}/output/nrf52840/lib/libopenthread-diag.a)
-
-add_library(mbedcrypto STATIC IMPORTED)
-set_property(TARGET mbedcrypto PROPERTY IMPORTED_LOCATION ${BINARY_DIR}/output/nrf52840/lib/libmbedcrypto.a)
+set_property(TARGET openthread_diag PROPERTY IMPORTED_LOCATION ${BINARY_DIR}/output/${OT_BUILD_DIR}/lib/libopenthread-diag.a)
 
 add_library(openthread_platform_utils STATIC IMPORTED)
-set_property(TARGET openthread_platform_utils PROPERTY IMPORTED_LOCATION ${BINARY_DIR}/output/nrf52840/lib/libopenthread-platform-utils.a)
+set_property(TARGET openthread_platform_utils PROPERTY IMPORTED_LOCATION ${BINARY_DIR}/output/${OT_BUILD_DIR}/lib/libopenthread-platform-utils.a)
 
 add_library(openthread_ftd STATIC IMPORTED)
-set_property(TARGET openthread_ftd PROPERTY IMPORTED_LOCATION ${BINARY_DIR}/output/nrf52840/lib/libopenthread-ftd.a)
+set_property(TARGET openthread_ftd PROPERTY IMPORTED_LOCATION ${BINARY_DIR}/output/${OT_BUILD_DIR}/lib/libopenthread-ftd.a)
+set_property(TARGET openthread_ftd PROPERTY IMPORTED_LINK_DEPENDENT_LIBRARIES mbedtls) 
 
 add_library(openthread_cli_ftd STATIC IMPORTED)
-set_property(TARGET openthread_cli_ftd PROPERTY IMPORTED_LOCATION ${BINARY_DIR}/output/nrf52840/lib/libopenthread-cli-ftd.a)
+set_property(TARGET openthread_cli_ftd PROPERTY IMPORTED_LOCATION ${BINARY_DIR}/output/${OT_BUILD_DIR}/lib/libopenthread-cli-ftd.a)
 
-add_library(openthread_nrf52840 STATIC IMPORTED)
-set_property(TARGET openthread_nrf52840 PROPERTY IMPORTED_LOCATION ${BINARY_DIR}/output/nrf52840/lib/libopenthread-nrf52840.a)
+add_library(ot_platform_${PLATFORM_NAME} STATIC IMPORTED)
+set_property(TARGET ot_platform_${PLATFORM_NAME} PROPERTY IMPORTED_LOCATION ${BINARY_DIR}/output/${OT_BUILD_DIR}/lib/libopenthread-${OT_PLATFORM_NAME}.a)
 
-add_library(openthread_nrf52840_sdk STATIC IMPORTED)
-set_property(TARGET openthread_nrf52840_sdk PROPERTY IMPORTED_LOCATION ${BINARY_DIR}/output/nrf52840/lib/libopenthread-nrf52840-sdk.a)
+add_library(platform_${PLATFORM_NAME} INTERFACE)
 
-add_library(openthread_nrf52840_softdevice_sdk STATIC IMPORTED)
-set_property(TARGET openthread_nrf52840_softdevice_sdk PROPERTY IMPORTED_LOCATION ${BINARY_DIR}/output/nrf52840/lib/libopenthread-nrf52840-softdevice-sdk.a)
+target_include_directories(platform_${PLATFORM_NAME}
+    INTERFACE
+        ${BINARY_DIR}/output/include
+        ${BINARY_DIR}/build/${OT_BUILD_DIR}/include
+        ${PLATFORM_CONFIG_INCLUDE_DIRECTORIES}
+)
 
-add_library(openthread_nordicsemi INTERFACE)
-target_include_directories(openthread_nordicsemi INTERFACE
-    ${BINARY_DIR}/output/include
-    ${BINARY_DIR}/build/nrf52840/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/cmsis
-    ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/dependencies
-    ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/drivers/clock
-    ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/libraries/app_error
-    ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/libraries/crypto
-    ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/libraries/nrf_cc310/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/nrfx
-    ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/nrfx/drivers/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/nrfx/hal
-    ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/nrfx/mdk)
+target_link_libraries(platform_${PLATFORM_NAME}
+    INTERFACE
+        ot_platform_${PLATFORM_NAME}
+)
 
-target_compile_definitions(openthread_nordicsemi INTERFACE
-    CONFIG_GPIO_AS_PINRESET
-    NRF52840_XXAA)
+target_compile_definitions(platform_${PLATFORM_NAME}
+    INTERFACE
+        PLATFORM_${PLATFORM_NAME}
+)
 
-add_dependencies(openthread_nordicsemi ot)
+if (${PLATFORM_NAME} STREQUAL nrf52)
+    target_compile_definitions(platform_${PLATFORM_NAME}
+        INTERFACE
+            CONFIG_GPIO_AS_PINRESET
+            NRF52840_XXAA
+    )
+
+endif()
 
 add_library(openthread INTERFACE)
-target_link_libraries(openthread INTERFACE
-    openthread_cli_ftd
-    openthread_diag
-    openthread_ftd
-    mbedcrypto
-    openthread_nrf52840
-    openthread_nrf52840_sdk
-    openthread_nrf52840_softdevice_sdk
-    openthread_platform_utils
-    openthread_nordicsemi
-    nrf_cc310)
 
-target_compile_definitions(openthread INTERFACE
-    MBEDTLS_CONFIG_FILE=\"mbedtls-config.h\"
-    MBEDTLS_USER_CONFIG_FILE=\"nrf52840-mbedtls-config.h\"
-    OPENTHREAD_PROJECT_CORE_CONFIG_FILE=\"openthread-core-nrf52840-config.h\"
-    MBEDTLS_BASE64_C
-    MBEDTLS_OID_C
-    MBEDTLS_PEM_PARSE_C
-    MBEDTLS_X509_USE_C
-    MBEDTLS_X509_CRT_PARSE_C
-    NRF52840_XXAA)
+target_link_libraries(openthread
+    INTERFACE
+        openthread_cli_ftd
+        openthread_diag
+        openthread_ftd
+        openthread_platform_utils
+        ot_platform_${PLATFORM_NAME}
+)
+
+if (${PLATFORM_NAME} STREQUAL nrf52)
+    target_link_libraries(openthread
+        INTERFACE
+            nrf_cc310
+    )
+endif()
 
 target_include_directories(openthread INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}/repo/examples/platforms
-    ${CMAKE_CURRENT_SOURCE_DIR}/repo/examples/platforms/nrf52840
+    ${CMAKE_CURRENT_SOURCE_DIR}/repo/examples/platforms/${OT_PLATFORM_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/repo/src/core
-    ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/mbedtls
-    ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/mbedtls/repo/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/mbedtls/repo/include/mbedtls)
+)
+
+add_dependencies(openthread ot)
+add_dependencies(ot mbedcrypto)

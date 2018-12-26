@@ -13,14 +13,11 @@ add_library(freertos ${FREERTOS_SRCS})
 target_include_directories(freertos
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/repo/FreeRTOS/Source/include
-        ${CMAKE_CURRENT_SOURCE_DIR}/repo/FreeRTOS/freertos/portable/GCC/nrf52
-        ${CMAKE_CURRENT_SOURCE_DIR}/repo/FreeRTOS/freertos/portable/CMSIS/nrf52
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 target_link_libraries(freertos
     PUBLIC
-        openthread_nordicsemi
         freertos_portable
 )
 
@@ -30,3 +27,12 @@ target_compile_options(freertos
        -Wextra
        -Wshadow
        -Werror)
+
+add_library(freertos_port_hdrs INTERFACE)
+
+target_include_directories(freertos_port_hdrs
+    INTERFACE 
+        ${CMAKE_CURRENT_SOURCE_DIR}/repo/FreeRTOS/Source/include
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)
+

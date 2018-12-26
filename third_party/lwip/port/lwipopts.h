@@ -453,4 +453,10 @@
 
 #define LWIP_DEBUG 1
 
+#ifdef PLATFORM_linux
+#define LWIP_PROVIDE_ERRNO              0
+#define LWIP_ERRNO_STDINCLUDE           1
+#define IPV6_FRAG_COPYHEADER            1
+#endif
+
 #endif /* __LWIPOPTS_H__ */
