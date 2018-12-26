@@ -37,43 +37,59 @@ add_subdirectory(src/apps/test)
 
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-add_library(common_utils
+add_library(otr_common_utils
     ${SRC_DIR}/common/entropy_utils.c
 )
 
-target_include_directories(common_utils
+target_include_directories(otr_common_utils
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-target_link_libraries(common_utils
+target_link_libraries(otr_common_utils
     PUBLIC
         mbedcrypto
+    PRIVATE
+        openthread
 )
 
-target_compile_options(common_utils
+target_compile_options(otr_common_utils
     PRIVATE
         ${FIRST_PARTY_COMPILE_FLAGS}
 )
 
-add_library(frameworks
-    ${SRC_DIR}/apps/misc/nat64_utils.c
-    ${SRC_DIR}/apps/misc/time_ntp.cpp
+add_library(otr_core
     ${SRC_DIR}/openthread/netif.cpp
     ${SRC_DIR}/openthread/openthread_freertos.c
 )
 
-target_link_libraries(frameworks
+target_include_directories(otr_core
     PUBLIC
-        common_utils
-        freertos
-        jansson
-        libjwt
-        lwip
-        openthread
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-target_compile_options(frameworks
+target_link_libraries(otr_core
+    PUBLIC
+        openthread
+        freertos
+        mbedtls
+        lwip
+)
+        
+
+add_library(otr_frameworks
+    ${SRC_DIR}/apps/misc/nat64_utils.c
+    ${SRC_DIR}/apps/misc/time_ntp.cpp
+)
+
+target_link_libraries(otr_frameworks
+    PUBLIC
+        otr_core
+        jansson
+        libjwt
+)
+
+target_compile_options(otr_frameworks
     PRIVATE
         ${FIRST_PARTY_COMPILE_FLAGS}
 )

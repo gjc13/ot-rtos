@@ -28,7 +28,7 @@ static void ProcessTest(int argc, char *argv[])
     }
     else if (!strcmp(argv[0], "http"))
     {
-        xTaskCreate(httpTask, "http", 2048, otxGetInstance(), 2, &gTestTask);
+        xTaskCreate(httpTask, "http", 2048, otrGetInstance(), 2, &gTestTask);
     }
     else if (!strcmp(argv[0], "mqtt"))
     {
@@ -52,7 +52,7 @@ static void ProcessEchoServer(int argc, char *argv[])
         return;
     }
 
-    if (!startTcpEchoServer(otxGetInstance(), (uint16_t)port))
+    if (!startTcpEchoServer(otrGetInstance(), (uint16_t)port))
     {
         otCliUartAppendResult(OT_ERROR_BUSY);
         return;
@@ -75,7 +75,7 @@ static void ProcessConnect(int argc, char *argv[])
         return;
     }
 
-    if (!startTcpConnect(otxGetInstance(), argv[0], (uint16_t)port))
+    if (!startTcpConnect(otrGetInstance(), argv[0], (uint16_t)port))
     {
         otCliUartAppendResult(OT_ERROR_BUSY);
         return;
@@ -119,7 +119,7 @@ static void ProcessSend(int argc, char *argv[])
         return;
     }
 
-    if (!startTcpSend(otxGetInstance(), (uint16_t)count, (uint16_t)size))
+    if (!startTcpSend(otrGetInstance(), (uint16_t)count, (uint16_t)size))
     {
         otCliUartAppendResult(OT_ERROR_BUSY);
         return;
@@ -135,7 +135,7 @@ static const struct otCliCommand sCommands[] = {
 };
 
 
-void otxUserInit(void)
+void otrUserInit(void)
 {
     otCliUartSetUserCommands(sCommands, sizeof(sCommands) / sizeof(sCommands[0]));
 }

@@ -8,4 +8,5 @@ add_library(test_app
 
 target_link_libraries(test_app
     PUBLIC
-        frameworks)
+        otr_frameworks
+)

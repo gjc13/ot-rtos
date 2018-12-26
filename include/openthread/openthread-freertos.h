@@ -49,46 +49,46 @@ extern "C" {
  * This function initializes FreeRTOS and OpenThread.
  *
  */
-void otxInit(int argc, char *argv[]);
+void otrInit(int argc, char *argv[]);
 
 /**
  * This function starts OpenThread task.
  *
  */
-void otxStart(void);
+void otrStart(void);
 
 /**
  * This function notifies OpenThread task.
  *
  */
-void otxTaskNotifyGive(void);
+void otrTaskNotifyGive(void);
 
 /**
  * This function notifies OpenThread task from ISR.
  *
  */
-void otxTaskNotifyGiveFromISR(void);
+void otrTaskNotifyGiveFromISR(void);
 
 /**
  * This function locks OpenThread task.
  *
  */
-void otxLock(void);
+void otrLock(void);
 
 /**
  * This function unlocks OpenThread task.
  */
-void otxUnlock(void);
+void otrUnlock(void);
 
 /**
  * This function initializes user application.
  */
-void otxUserInit(void);
+void otrUserInit(void);
 
 /**
  * This function gets ot instance
  */
-otInstance *otxGetInstance();
+otInstance *otrGetInstance();
 
 #ifndef portFORCE_INLINE
 #define portFORCE_INLINE inline __attribute__((always_inline))
@@ -97,13 +97,13 @@ otInstance *otxGetInstance();
  * This function returns if it is in ISR context.
  *
  */
-portFORCE_INLINE static BaseType_t otxPortIsInsideInterrupt(void)
+portFORCE_INLINE static BaseType_t otrPortIsInsideInterrupt(void)
 {
     uint32_t   ulCurrentInterrupt;
     BaseType_t xReturn;
 
     /* Obtain the number of the currently executing interrupt. */
-    PORT_GET_IN_ISR(ulCurrentInterrupt);
+    OTR_PORT_GET_IN_ISR(ulCurrentInterrupt);
 
     if (ulCurrentInterrupt == 0)
     {
@@ -126,10 +126,10 @@ portFORCE_INLINE static BaseType_t otxPortIsInsideInterrupt(void)
 #define OT_API_CALL(...)     \
     do                       \
     {                        \
-        otxLock();           \
+        otrLock();           \
         __VA_ARGS__;         \
-        otxUnlock();         \
-        otxTaskNotifyGive(); \
+        otrUnlock();         \
+        otrTaskNotifyGive(); \
     } while (0)
 
 #ifdef __cplusplus

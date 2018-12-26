@@ -92,14 +92,14 @@ static void mainloop(void *aContext)
     vTaskDelete(NULL);
 }
 
-void otxTaskNotifyGive()
+void otrTaskNotifyGive()
 {
 #if !PLATFORM_linux && !PLATFORM_linux_radio // linux use select rather than event notification
     xTaskNotifyGive(sMainTask);
 #endif
 }
 
-void otxTaskNotifyGiveFromISR()
+void otrTaskNotifyGiveFromISR()
 {
 #if !PLATFORM_linux && !PLATFORM_linux_radio // linux use select rather than event notification
     BaseType_t taskWoken;
@@ -116,12 +116,12 @@ void otxTaskNotifyGiveFromISR()
 void otTaskletsSignalPending(otInstance *aInstance)
 {
     (void)aInstance;
-    otxTaskNotifyGive();
+    otrTaskNotifyGive();
     // TODO aInstance != sInstance
     // assert(aInstance == sInstance);
 }
 
-void otxInit(int argc, char *argv[])
+void otrInit(int argc, char *argv[])
 {
 #if PLATFORM_linux_radio
     sInstance = otSysInit(argc, argv);
@@ -142,15 +142,15 @@ void otxInit(int argc, char *argv[])
     assert(sExternalLock != NULL);
 }
 
-void otxStart(void)
+void otrStart(void)
 {
     xTaskCreate(mainloop, "ot", 4096, sInstance, 2, &sMainTask);
     // Activate deep sleep mode
-    PORT_ENABLE_SLEEP();
+    OTR_PORT_ENABLE_SLEEP();
     vTaskStartScheduler();
 }
 
-void otxLock(void)
+void otrLock(void)
 {
     if (xTaskGetCurrentTaskHandle() != sMainTask)
     {
@@ -158,7 +158,7 @@ void otxLock(void)
     }
 }
 
-void otxUnlock(void)
+void otrUnlock(void)
 {
     if (xTaskGetCurrentTaskHandle() != sMainTask)
     {
@@ -168,17 +168,17 @@ void otxUnlock(void)
 
 void otSysEventSignalPending(void)
 {
-    if (otxPortIsInsideInterrupt())
+    if (otrPortIsInsideInterrupt())
     {
-        otxTaskNotifyGiveFromISR();
+        otrTaskNotifyGiveFromISR();
     }
     else
     {
-        otxTaskNotifyGive();
+        otrTaskNotifyGive();
     }
 }
 
-otInstance *otxGetInstance()
+otInstance *otrGetInstance()
 {
     return sInstance;
 }

@@ -102,7 +102,7 @@ target_link_libraries(lwip
         freertos
         platform_${PLATFORM_NAME}
     PRIVATE
-        common_utils
+        otr_common_utils
         mbedcrypto
         mbedtls
         mbedx509

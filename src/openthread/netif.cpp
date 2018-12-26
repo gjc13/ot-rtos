@@ -114,7 +114,7 @@ static err_t netifOutputIp6(struct netif *aNetif, struct pbuf *aBuffer, const ip
     }
     xSemaphoreGive(sGuardOutput);
 
-    otxTaskNotifyGive();
+    otrTaskNotifyGive();
 
 exit:
     if (err != ERR_OK)
@@ -144,7 +144,7 @@ static err_t netifInit(struct netif *aNetif)
     return ERR_OK;
 }
 
-struct netif *otxGetNetif(void)
+struct netif *otrGetNetif(void)
 {
     return &sNetif;
 }
@@ -163,7 +163,7 @@ static void addAddress(const otIp6Address &aAddress)
     else
     {
         int8_t                   index  = -1;
-        const otMeshLocalPrefix *prefix = otThreadGetMeshLocalPrefix(otxGetInstance());
+        const otMeshLocalPrefix *prefix = otThreadGetMeshLocalPrefix(otrGetInstance());
 
         err = netif_add_ip6_address(&sNetif, reinterpret_cast<const ip6_addr_t *>(&aAddress), &index);
         VerifyOrExit(err == ERR_OK && index != -1, error = OT_ERROR_FAILED);
@@ -322,7 +322,7 @@ static void processTransmit(otInstance *aInstance)
     // Notify if more
     if (sHeadOutput != NULL)
     {
-        otxTaskNotifyGive();
+        otrTaskNotifyGive();
     }
     else
     {

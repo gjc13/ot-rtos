@@ -98,9 +98,9 @@ int main(int argc, char *argv[])
         execvp(argv[0], argv);
     }
 #endif
-    otxInit(argc, argv);
-    otCliUartInit(otxGetInstance());
-    otxUserInit();
-    otxStart();
+    otrInit(argc, argv);
+    otCliUartInit(otrGetInstance());
+    otrUserInit();
+    otrStart();
     return 0;
 }

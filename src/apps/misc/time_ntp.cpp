@@ -31,7 +31,7 @@ void ntpHandle(void *aContext, uint64_t aTime, otError aResult)
 
 uint64_t timeNtp()
 {
-    otInstance *  instance = otxGetInstance();
+    otInstance *  instance = otrGetInstance();
     otSntpQuery   query;
     otMessageInfo messageInfo;
     NtpContext    ctx;
