@@ -18,7 +18,7 @@ set(JANSSON_SRC_FILES
 
 add_library(jansson ${JANSSON_SRC_FILES})
 
-target_compile_options(jansson 
+target_compile_options(jansson
     PRIVATE
         -Wall
         -Wextra
