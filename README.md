@@ -6,10 +6,20 @@ OpenThread + LwIP + FreeRTOS
 Get Started
 ------------
 
+###Build 
+Build for linux:
 ```sh
 git submodule update --init
 mkdir build && cd build
-cmake .. -DCMAKE_TOOLCHAIN_FILE=../cmake/arm-none-eabi.cmake
+cmake .. -DPLATFORM_NAME=linux
+make -j12
+```
+
+Build for nrf52840:
+```sh
+git submodule update --init
+mkdir build && cd build
+cmake .. -DCMAKE_TOOLCHAIN_FILE=../cmake/arm-none-eabi.cmake -DPLATFORM_NAME=nrf52
 make -j12
 ```
 
