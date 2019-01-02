@@ -164,6 +164,7 @@ add_library(openthread INTERFACE)
 
 target_link_libraries(openthread
     INTERFACE
+        mbedcrypto
         openthread_cli_ftd
         openthread_diag
         openthread_ftd
@@ -178,7 +179,7 @@ if (NOT ${PLATFORM_NAME} STREQUAL linux_radio)
 endif()
 
 if (${PLATFORM_NAME} STREQUAL nrf52)
-    target_link_libraries(openthread
+    target_link_libraries(platform_${PLATFORM_NAME}
         INTERFACE
             nrf_cc310
     )
