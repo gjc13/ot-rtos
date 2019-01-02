@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.7)
 set(ENABLE_TESTING OFF CACHE BOOL "Disable mbedtls test")
 set(ENABLE_PROGRAMS OFF CACHE BOOL "Disable mbetls program")
 
+#Required to set add interface level link library for mbedcrypto
+SET(CMAKE_POLICY_DEFAULT_CMP0022 NEW)
 add_subdirectory(repo)
 
 #unforunately mbedtls used include_directories which is not visisble outside
@@ -20,6 +22,12 @@ target_compile_definitions(mbedcrypto
         ENABLE_ECDHE_RSA=1
         $<TARGET_PROPERTY:openthread_config,INTERFACE_COMPILE_DEFINITIONS>
         $<TARGET_PROPERTY:mbedtls_platform_config,INTERFACE_COMPILE_DEFINITIONS>
+)
+
+
+target_link_libraries(mbedcrypto
+    INTERFACE
+        platform_${PLATFORM_NAME}
 )
 
 add_dependencies(mbedcrypto openthread_config)
