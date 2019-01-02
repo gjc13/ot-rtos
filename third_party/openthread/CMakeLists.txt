@@ -1,5 +1,8 @@
 cmake_minimum_required (VERSION 3.7)
 
+# Keep use bash avoid escape issues on different platforms
+set(SHELL "bash")
+
 include(ExternalProject)
 
 if (${PLATFORM_NAME} STREQUAL nrf52)
@@ -50,31 +53,28 @@ if (${PLATFORM_NAME} STREQUAL nrf52)
     )
 endif()
 
-set(OT_EXTERNAL_DEFINITIONS OPENTHREAD_CONFIG_MAX_STATECHANGE_HANDLERS=4)
+set(OT_CPPFLAGS "-DOPENTHREAD_CONFIG_MAX_STATECHANGE_HANDLERS=4 -I$<JOIN:$<TARGET_PROPERTY:mbedcrypto,INTERFACE_INCLUDE_DIRECTORIES>, -I> -D$<JOIN:$<TARGET_PROPERTY:mbedcrypto,INTERFACE_COMPILE_DEFINITIONS>, -D>")
+set(OT_SWITCHES "JOINER=1 SNTP_CLIENT=1 FULL_LOGS=1 DISABLE_BUILTIN_MBEDTLS=1 DISABLE_EXECUTABLE=1")
 
-if (${PLATFORM_NAME} STREQUAL linux_radio)
-    set(OT_EXTERNAL_DEFINITIONS 
-            ${OT_EXTERNAL_DEFINITIONS}
-            OPENTHREAD_CONFIG_POSIX_APP_ENABLE_PTY_DEVICE=0
-    )
+if (${PLATFORM_NAME} STREQUAL linux_radio) 
+    set(OT_CPPFLAGS "-DOPENTHREAD_CONFIG_POSIX_APP_ENABLE_PTY_DEVICE=0 ${OT_CPPFLAGS}")
 endif()
 
-string(REGEX REPLACE ";" " -D" OT_CPPFLAGS "${OT_EXTERNAL_DEFINITIONS}")
-set(OT_CPPFLAGS "-D${OT_CPPFLAGS}")
-
-ExternalProject_Add(ot_config
+ExternalProject_Add(ot
     SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/repo
-    CONFIGURE_COMMAND cd ${CMAKE_CURRENT_SOURCE_DIR}/repo && ./bootstrap
-    BUILD_COMMAND sh -c "CPPFLAGS='${OT_CPPFLAGS}' make -f ${OT_MAKEFILE} JOINER=1 SNTP_CLIENT=1 FULL_LOGS=1 DISABLE_BUILTIN_MBEDTLS=1 configure"
+    CONFIGURE_COMMAND ${SHELL} -c "cd ${CMAKE_CURRENT_SOURCE_DIR}/repo && ./bootstrap" && env CPPFLAGS=${OT_CPPFLAGS} ${SHELL} -c "CPPFLAGS=\${CPPFLAGS//\\\"/\\\\\\\\\\\\\\\"} make -f ${OT_MAKEFILE} ${OT_SWITCHES} configure"
+    BUILD_COMMAND env CPPFLAGS=${OT_CPPFLAGS} ${SHELL} -c "CPPFLAGS=\${CPPFLAGS//\\\"/\\\\\\\\\\\\\\\"} make -f ${OT_MAKEFILE} ${OT_SWITCHES}"
     INSTALL_COMMAND cmake -E echo "Skipping install step."
-    EXCLUDE_FROM_ALL FALSE
+    BUILD_ALWAYS TRUE
+    EXCLUDE_FROM_ALL TRUE
 )
-
-ExternalProject_Get_Property(ot_config BINARY_DIR)
+ExternalProject_Get_Property(ot BINARY_DIR)
+ExternalProject_Add_StepTargets(ot configure)
 
 add_library(openthread_config INTERFACE)
+add_dependencies(openthread_config ot-configure)
 
-target_include_directories(openthread_config 
+target_include_directories(openthread_config
     INTERFACE
         ${BINARY_DIR}/build/${OT_BUILD_DIR}/include
         ${BINARY_DIR}/output/include
@@ -97,8 +97,6 @@ if (${PLATFORM_NAME} STREQUAL nrf52)
     )
 endif()
 
-add_dependencies(openthread_config ot_config)
-
 add_library(mbedtls_platform_config INTERFACE)
 
 if (${PLATFORM_NAME} STREQUAL nrf52)
@@ -113,16 +111,6 @@ if (${PLATFORM_NAME} STREQUAL nrf52)
     )
 endif()
 
-ExternalProject_Add(ot
-    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/repo
-    CONFIGURE_COMMAND cd ${CMAKE_CURRENT_SOURCE_DIR}/repo && ./bootstrap
-    BUILD_COMMAND sh -c "RAW_CPPFLAGS='${OT_CPPFLAGS} -I$<JOIN:$<TARGET_PROPERTY:mbedcrypto,INTERFACE_INCLUDE_DIRECTORIES>, -I> -D$<JOIN:$<TARGET_PROPERTY:mbedcrypto,INTERFACE_COMPILE_DEFINITIONS>, -D>' CPPFLAGS=$\{RAW_CPPFLAGS//\\\"/\\\\\\\\\\\\\\\"} make -f ${OT_MAKEFILE} JOINER=1 SNTP_CLIENT=1 FULL_LOGS=1 DISABLE_BUILTIN_MBEDTLS=1 DISABLE_EXECUTABLE=1"
-    INSTALL_COMMAND cmake -E echo "Skipping install step."
-    EXCLUDE_FROM_ALL TRUE
-)
-
-ExternalProject_Get_Property(ot BINARY_DIR)
-
 if (${PLATFORM_NAME} STREQUAL nrf52)
     add_library(nrf_cc310 STATIC IMPORTED)
     set_property(TARGET nrf_cc310 PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/repo/third_party/NordicSemiconductor/libraries/nrf_cc310/lib/libnrf_cc310_0.9.10.a)
@@ -136,7 +124,7 @@ set_property(TARGET openthread_platform_utils PROPERTY IMPORTED_LOCATION ${BINAR
 
 add_library(openthread_ftd STATIC IMPORTED)
 set_property(TARGET openthread_ftd PROPERTY IMPORTED_LOCATION ${BINARY_DIR}/output/${OT_BUILD_DIR}/lib/libopenthread-ftd.a)
-set_property(TARGET openthread_ftd PROPERTY IMPORTED_LINK_DEPENDENT_LIBRARIES mbedtls) 
+set_property(TARGET openthread_ftd PROPERTY IMPORTED_LINK_DEPENDENT_LIBRARIES mbedtls)
 
 add_library(openthread_cli_ftd STATIC IMPORTED)
 set_property(TARGET openthread_cli_ftd PROPERTY IMPORTED_LOCATION ${BINARY_DIR}/output/${OT_BUILD_DIR}/lib/libopenthread-cli-ftd.a)
