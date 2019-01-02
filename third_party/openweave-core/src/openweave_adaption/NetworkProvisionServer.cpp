@@ -1,7 +1,6 @@
 #include "Weave/Profiles/WeaveProfiles.h"
 #include "openthread/link.h"
 #include "openthread/openthread-freertos.h"
-#include "openthread/ot_api_call.h"
 #include "openthread/thread.h"
 #include "openweave_adaption/NetworkProvisionServer.hpp"
 
@@ -75,7 +74,7 @@ WEAVE_ERROR NetworkProvisioningFreeRTOSServer::ScanThreadNetworks()
     else
     {
         otError otErr;
-        OT_API_CALL(otErr = otLinkActiveScan(otxGetInstance(), scanChannels, scanDuration, sOtScanHandler, this));
+        OT_API_CALL(otErr = otLinkActiveScan(otrGetInstance(), scanChannels, scanDuration, sOtScanHandler, this));
 
         if (otErr == OT_ERROR_BUSY)
         {
@@ -457,7 +456,7 @@ WEAVE_ERROR NetworkProvisioningFreeRTOSServer::HandleEnableNetwork(uint32_t netw
         otMasterKey     key;
 
         printf("Set name %s\n", existingNetworkConfig->ThreadNetworkName);
-        OT_API_CALL(otErr = otThreadSetNetworkName(otxGetInstance(), existingNetworkConfig->ThreadNetworkName));
+        OT_API_CALL(otErr = otThreadSetNetworkName(otrGetInstance(), existingNetworkConfig->ThreadNetworkName));
         printf("1 err %d\n", otErr);
         if (otErr != OT_ERROR_NONE)
         {
@@ -470,7 +469,7 @@ WEAVE_ERROR NetworkProvisioningFreeRTOSServer::HandleEnableNetwork(uint32_t netw
         }
         printf("\n");
         memcpy(extPanId.m8, existingNetworkConfig->ThreadExtendedPANId, sizeof(extPanId.m8));
-        OT_API_CALL(otErr = otThreadSetExtendedPanId(otxGetInstance(), &extPanId));
+        OT_API_CALL(otErr = otThreadSetExtendedPanId(otrGetInstance(), &extPanId));
         printf("3 err %d\n", otErr);
         if (otErr != OT_ERROR_NONE)
         {
@@ -483,14 +482,14 @@ WEAVE_ERROR NetworkProvisioningFreeRTOSServer::HandleEnableNetwork(uint32_t netw
         }
         printf("\n");
         memcpy(key.m8, existingNetworkConfig->ThreadNetworkKey, existingNetworkConfig->ThreadNetworkKeyLen);
-        OT_API_CALL(otErr = otThreadSetMasterKey(otxGetInstance(), &key));
+        OT_API_CALL(otErr = otThreadSetMasterKey(otrGetInstance(), &key));
         printf("5 err %d\n", otErr);
         if (otErr != OT_ERROR_NONE)
         {
             break;
         }
 
-        OT_API_CALL(otErr = otThreadSetEnabled(otxGetInstance(), true));
+        OT_API_CALL(otErr = otThreadSetEnabled(otrGetInstance(), true));
         printf("6 err %d\n", otErr);
     } while (0);
 
@@ -530,7 +529,7 @@ WEAVE_ERROR NetworkProvisioningFreeRTOSServer::HandleDisableNetwork(uint32_t net
         ExitNow();
     }
 
-    OT_API_CALL(otErr = otThreadSetEnabled(otxGetInstance(), false));
+    OT_API_CALL(otErr = otThreadSetEnabled(otrGetInstance(), false));
 
     if (otErr == OT_ERROR_NONE)
     {
@@ -565,7 +564,7 @@ WEAVE_ERROR NetworkProvisioningFreeRTOSServer::HandleTestConnectivity(uint32_t n
         ExitNow();
     }
 
-    OT_API_CALL(role = otThreadGetDeviceRole(otxGetInstance()));
+    OT_API_CALL(role = otThreadGetDeviceRole(otrGetInstance()));
     if (role != OT_DEVICE_ROLE_DISABLED || OT_DEVICE_ROLE_DETACHED)
     {
         err = SendSuccessResponse();

@@ -4,7 +4,7 @@
 #include "Weave/Core/WeaveGlobals.h"
 #include "Weave/Profiles/device-control/DeviceControl.h"
 #include "Weave/Support/CodeUtils.h"
-#include "openthread/ot_api_call.h"
+#include "openthread/openthread-freertos.h"
 
 #include <task.h>
 
@@ -35,13 +35,13 @@ WEAVE_ERROR ThreadAssistedPairer::ScanThreadNetworks()
     WEAVE_ERROR err = WEAVE_NO_ERROR;
     otError     otErr;
 
-    OT_API_CALL(err = otIp6SetEnabled(otxGetInstance(), true));
+    OT_API_CALL(err = otIp6SetEnabled(otrGetInstance(), true));
     if (otErr != OT_ERROR_NONE)
     {
         ExitNow(err = WEAVE_ERROR_INCORRECT_STATE);
     }
     mNowScanCnt = 0;
-    OT_API_CALL(otErr = otThreadDiscover(otxGetInstance(), 0, 0xffff, true, false, sOtScanHandler, this));
+    OT_API_CALL(otErr = otThreadDiscover(otrGetInstance(), 0, 0xffff, true, false, sOtScanHandler, this));
     //OT_API_CALL(otErr = otLinkActiveScan(otxGetInstance(), 0, 0, sOtScanHandler, this));
     if (otErr != OT_ERROR_NONE)
     {
@@ -114,22 +114,22 @@ otError ThreadAssistedPairer::ConnectToPan(otActiveScanResult *aTarget)
     otError err;
     otLinkModeConfig linkConfig;
 
-    OT_API_CALL(err = otIp6SetEnabled(otxGetInstance(), false));
+    OT_API_CALL(err = otIp6SetEnabled(otrGetInstance(), false));
     SuccessOrExit(err);
 
-    OT_API_CALL(err = otThreadSetNetworkName(otxGetInstance(), aTarget->mNetworkName.m8));
+    OT_API_CALL(err = otThreadSetNetworkName(otrGetInstance(), aTarget->mNetworkName.m8));
     SuccessOrExit(err);
 
-    OT_API_CALL(err = otLinkSetPanId(otxGetInstance(), aTarget->mPanId));
+    OT_API_CALL(err = otLinkSetPanId(otrGetInstance(), aTarget->mPanId));
     SuccessOrExit(err);
 
-    OT_API_CALL(err = otThreadSetExtendedPanId(otxGetInstance(), &aTarget->mExtendedPanId));
+    OT_API_CALL(err = otThreadSetExtendedPanId(otrGetInstance(), &aTarget->mExtendedPanId));
     SuccessOrExit(err);
 
-    OT_API_CALL(err = otLinkSetChannel(otxGetInstance(), aTarget->mChannel));
+    OT_API_CALL(err = otLinkSetChannel(otrGetInstance(), aTarget->mChannel));
     SuccessOrExit(err);
 
-    OT_API_CALL(err = otIp6SetEnabled(otxGetInstance(), true));
+    OT_API_CALL(err = otIp6SetEnabled(otrGetInstance(), true));
     SuccessOrExit(err);
 
     linkConfig.mRxOnWhenIdle = true;
@@ -137,7 +137,7 @@ otError ThreadAssistedPairer::ConnectToPan(otActiveScanResult *aTarget)
     linkConfig.mNetworkData = true;
     linkConfig.mSecureDataRequests = true;
 
-    OT_API_CALL(err = otThreadSetLinkMode(otxGetInstance(), linkConfig));
+    OT_API_CALL(err = otThreadSetLinkMode(otrGetInstance(), linkConfig));
     SuccessOrExit(err);
 exit:
     return err;
@@ -147,7 +147,7 @@ otError ThreadAssistedPairer::OpenUnsecurePort()
 {
     otError err;
 
-    OT_API_CALL(err = otIp6AddUnsecurePort(otxGetInstance(), WEAVE_UNSECURE_PORT));
+    OT_API_CALL(err = otIp6AddUnsecurePort(otrGetInstance(), WEAVE_UNSECURE_PORT));
     return err;
 };
 

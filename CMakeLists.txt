@@ -63,7 +63,6 @@ add_library(otr_core
     ${SRC_DIR}/openthread/netif.cpp
     ${SRC_DIR}/openthread/uart_lock.c
     ${SRC_DIR}/openthread/openthread_freertos.c
-    ${SRC_DIR}/openthread/uart_lock.c
 )
 
 target_include_directories(otr_core
@@ -90,8 +89,6 @@ target_link_libraries(otr_frameworks
         otr_core
         jansson
         libjwt
-        lwip
-        openthread
         openweave
 )
 

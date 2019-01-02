@@ -222,9 +222,7 @@ target_compile_definitions(openweave
 
 target_link_libraries(openweave
     PUBLIC
-        lwip
-        platform
-        openthread
+        otr_core
         micro_ecc
         mincrypt
     PRIVATE
