@@ -29,7 +29,7 @@
 #include "entropy_utils.h"
 
 #include <mbedtls/entropy.h>
-#include <openthread/platform/random.h>
+#include <openthread/platform/entropy.h>
 
 int otrMbedtlsEntropyPoll(void *aData, unsigned char *aOutput, size_t aInLen, size_t *aOutLen)
 {
@@ -37,7 +37,7 @@ int otrMbedtlsEntropyPoll(void *aData, unsigned char *aOutput, size_t aInLen, si
 
     int rval = 0;
     // TODO access to random SHOULD be guarded.
-    otError error = otPlatRandomGetTrue((uint8_t *)aOutput, (uint16_t)aInLen);
+    otError error = otPlatEntropyGet((uint8_t *)aOutput, (uint16_t)aInLen);
 
     if (aOutLen != NULL)
     {
