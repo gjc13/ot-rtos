@@ -134,6 +134,22 @@ target_link_libraries(ot_cli_${PLATFORM_NAME}
 )
 
 if (${PLATFORM_NAME} STREQUAL nrf52)
+    add_executable(ot_aogh
+        ${SRC_DIR}/apps/cli/main.c
+        ${SRC_DIR}/core/io_redirect.c
+    )
+
+    target_link_libraries(ot_aogh
+        PUBLIC
+            aogh
+    )
+
+    target_compile_definitions(ot_aogh
+        PUBLIC
+            __HEAP_SIZE=8192
+            __STACK_SIZE=8192
+    )
+
     add_executable(ot_demo_101
         ${SRC_DIR}/apps/cli/main.c
         ${SRC_DIR}/core/io_redirect.c
@@ -161,6 +177,8 @@ if (${PLATFORM_NAME} STREQUAL nrf52)
     set_target_properties(ot_cli_${PLATFORM_NAME} PROPERTIES LINK_FLAGS "-T ${CMAKE_CURRENT_SOURCE_DIR}/third_party/openthread/repo/examples/platforms/nrf52840/nrf52840.ld -lc -lnosys -lm -lstdc++")
     set_target_properties(ot_demo_101 PROPERTIES LINK_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/third_party/openthread/repo/examples/platforms/nrf52840/nrf52840.ld)
     set_target_properties(ot_demo_101 PROPERTIES LINK_FLAGS "-T ${CMAKE_CURRENT_SOURCE_DIR}/third_party/openthread/repo/examples/platforms/nrf52840/nrf52840.ld -lc -lnosys -lm -lstdc++")
+    set_target_properties(ot_aogh PROPERTIES LINK_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/third_party/openthread/repo/examples/platforms/nrf52840/nrf52840.ld)
+    set_target_properties(ot_aogh PROPERTIES LINK_FLAGS "-T ${CMAKE_CURRENT_SOURCE_DIR}/third_party/openthread/repo/examples/platforms/nrf52840/nrf52840.ld -lc -lnosys -lm -lstdc++")
 
     #build hex file
     add_custom_command(OUTPUT ot_cli_${PLATFORM_NAME}.hex
@@ -174,6 +192,12 @@ if (${PLATFORM_NAME} STREQUAL nrf52)
         DEPENDS ot_demo_101
     )
     add_custom_target(ot_demo_101_hex ALL DEPENDS ot_demo_101.hex)
+
+    add_custom_command(OUTPUT ot_aogh.hex
+        COMMAND arm-none-eabi-objcopy -O ihex ot_aogh ot_aogh.hex
+        DEPENDS ot_aogh
+    )
+    add_custom_target(ot_aogh_hex ALL DEPENDS ot_aogh.hex)
 endif()
 
 set(PORT_DIRS 

@@ -65,3 +65,15 @@ if (${PLATFORM_NAME} STREQUAL nrf52)
             otr_frameworks
     )
 endif()
+
+if (${PLATFORM_NAME} STREQUAL nrf52)
+    add_library(aogh
+        ${CMAKE_CURRENT_SOURCE_DIR}/aogh/aogh.cpp
+    )
+
+    target_link_libraries(aogh
+        PUBLIC
+            otr_frameworks
+    )
+endif()
+
