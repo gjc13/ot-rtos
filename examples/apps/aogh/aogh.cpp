@@ -27,8 +27,8 @@
  */
 
 #include <FreeRTOS.h>
-#include <task.h>
 #include <string.h>
+#include <task.h>
 
 #include <openthread/ip6.h>
 #include <openthread/joiner.h>
@@ -43,10 +43,10 @@
 
 enum CommandType
 {
-    OFF = 0x00,
-    ON = 0x01,
+    OFF        = 0x00,
+    ON         = 0x01,
     BRIGHTNESS = 0x02,
-    MULTICAST = 0x48
+    MULTICAST  = 0x48
 };
 
 #define LED_BRIGHTNESS_MIN 0
@@ -55,8 +55,8 @@ enum CommandType
 #define LED_TURN_OFF 1
 #define LED_NUMBER 4
 
-const size_t MAC_ADDRESS_SIZE = 6;
-static const uint32_t LED_PIN[4] = {13, 14, 15, 16};
+const size_t          MAC_ADDRESS_SIZE = 6;
+static const uint32_t LED_PIN[4]       = {13, 14, 15, 16};
 
 static TaskHandle_t sAoghTask;
 
@@ -78,23 +78,17 @@ public:
         InitializeLED();
     }
 
-    void LaunchServer(void)
-    {
-        AoghServer();
-    }
+    void LaunchServer(void) { AoghServer(); }
 
 private:
     void ConnectToThread(void)
     {
-        OT_API_CALL(
-            otThreadSetNetworkName(otrGetInstance(), kTestNetworkName),
-            otThreadSetExtendedPanId(otrGetInstance(), &kTestNetworkXPanId),
-            otLinkSetPanId(otrGetInstance(), kTestNetworkPanId),
-            otLinkSetChannel(otrGetInstance(), kTestNetworkChannel),
-            otThreadSetMasterKey(otrGetInstance(), &kTestNetworkKey),
-            otIp6SetEnabled(otrGetInstance(), true),
-            otThreadSetEnabled(otrGetInstance(), true)
-        );
+        OT_API_CALL(otThreadSetNetworkName(otrGetInstance(), kTestNetworkName),
+                    otThreadSetExtendedPanId(otrGetInstance(), &kTestNetworkXPanId),
+                    otLinkSetPanId(otrGetInstance(), kTestNetworkPanId),
+                    otLinkSetChannel(otrGetInstance(), kTestNetworkChannel),
+                    otThreadSetMasterKey(otrGetInstance(), &kTestNetworkKey), otIp6SetEnabled(otrGetInstance(), true),
+                    otThreadSetEnabled(otrGetInstance(), true));
         // simply wait for a small while
         vTaskDelay(pdMS_TO_TICKS(2000));
     }
@@ -115,10 +109,10 @@ private:
         int          sockfd = socket(AF_INET6, SOCK_DGRAM, 0);
         int          ret    = 0;
         sockaddr_in6 bindAddr;
-        sockaddr     peerAddr;
+        sockaddr_in6 peerAddr;
         socklen_t    addrLen;
 
-        addrLen = sizeof(peerAddr);
+        addrLen              = sizeof(peerAddr);
         bindAddr.sin6_family = AF_INET6;
         bindAddr.sin6_addr   = IN6ADDR_ANY_INIT;
         bindAddr.sin6_port   = htons(kAoghPort);
@@ -129,8 +123,15 @@ private:
         {
             socklen_t size;
 
-            VerifyOrExit((size = recvfrom(sockfd, reinterpret_cast<char *>(mBuf), sizeof(mBuf), 0, &peerAddr,
-                                          &addrLen)) >= 0);
+            VerifyOrExit((size = recvfrom(sockfd, reinterpret_cast<char *>(mBuf), sizeof(mBuf), 0,
+                                          reinterpret_cast<sockaddr *>(&peerAddr), &addrLen)) >= 0);
+            printf("Peeraddr:\n");
+            uint8_t *p = (uint8_t *)&peerAddr;
+            for (size_t i = 0; i < addrLen; i++)
+            {
+                printf("%02x ", p[i]);
+            }
+            printf("\n");
             UdpHandler(sockfd, mBuf, peerAddr, size);
             taskYIELD();
         }
@@ -139,39 +140,41 @@ private:
         return ret;
     }
 
-    void UdpHandler(uint8_t aSockFd, const uint8_t *aData, const sockaddr &aPeerAddr, uint32_t aSize)
+    void UdpHandler(uint8_t aSockFd, const uint8_t *aData, const sockaddr_in6 &aPeerAddr, uint32_t aSize)
     {
         uint8_t command = *aData;
 
         switch (command)
         {
-            // respond six bytes as a mock mac address to multicast scan
-            case MULTICAST:
-                uint8_t macAddress[MAC_ADDRESS_SIZE];
+        // respond six bytes as a mock mac address to multicast scan
+        case MULTICAST:
+            uint8_t macAddress[MAC_ADDRESS_SIZE];
 
-                EuiToMacAddress(macAddress);
-                sendto(aSockFd, &macAddress, sizeof(macAddress), 0, &aPeerAddr, sizeof(aPeerAddr));
-                return;
+            EuiToMacAddress(macAddress);
+            sendto(aSockFd, &macAddress, sizeof(macAddress), 0, reinterpret_cast<const sockaddr *>(&aPeerAddr),
+                   sizeof(aPeerAddr));
+            return;
 
-            // turn off all LEDs
-            case OFF:
-                ControlLED(0);
-                break;
+        // turn off all LEDs
+        case OFF:
+            ControlLED(0);
+            break;
 
-            // turn on all LEDs
-            case ON:
-                ControlLED(100);
-                break;
+        // turn on all LEDs
+        case ON:
+            ControlLED(100);
+            break;
 
-            case BRIGHTNESS:
-                ControlLED(*(aData + 1));
-                break;
+        case BRIGHTNESS:
+            ControlLED(*(aData + 1));
+            break;
 
-            default:
-                printf("ERROR: unrecognized packet\n");
+        default:
+            printf("ERROR: unrecognized packet\n");
         }
 
-        sendto(aSockFd, &mBrightness, sizeof(mBrightness), 0, &aPeerAddr, sizeof(aPeerAddr));
+        sendto(aSockFd, &mBrightness, sizeof(mBrightness), 0, reinterpret_cast<const sockaddr *>(&aPeerAddr),
+               sizeof(aPeerAddr));
     }
 
     void EuiToMacAddress(uint8_t *aMacAddress)
@@ -195,8 +198,7 @@ private:
         printf("Set brightness to %d\n", aBrightness);
         mBrightness = aBrightness;
         // Every time increase (BRIGHTNESS_MAX / LED_NUM) percent of brightness, light up one LED
-        for (int i = 0; i < LED_NUMBER; ++i)
-            SwitchLED(i, i * LED_BRIGHTNESS_MAX / LED_NUMBER < mBrightness);
+        for (int i = 0; i < LED_NUMBER; ++i) SwitchLED(i, i * LED_BRIGHTNESS_MAX / LED_NUMBER < mBrightness);
 
         return aBrightness;
     }
@@ -207,14 +209,13 @@ private:
         nrf_gpio_pin_write(LED_PIN[aId], aState ? LED_TURN_ON : LED_TURN_OFF);
     }
 
-    uint8_t mBuf[1500], mBrightness;
+    uint8_t               mBuf[1500], mBrightness;
     static const uint16_t kAoghPort = 30000;
-
 };
 
 void aoghTask(void *p)
 {
-    (void) p;
+    (void)p;
     AoghTask t;
 
     t.Initialize();
